@@ -4,6 +4,7 @@ import "@workspace/ui/globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@workspace/ui/lib/utils"
 import { Navigation } from "@/components/Navigation"
+import { Footer } from "@/components/Footer"
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'})
 
@@ -26,9 +27,10 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <Navigation />
-          <main className="pt-16 md:pt-16 pb-28 md:pb-0">
+          <main className="pt-16 md:pt-16 min-h-[calc(100vh-64px)]">
             {children}
           </main>
+          <Footer />
         </ThemeProvider>
       </body>
     </html>
