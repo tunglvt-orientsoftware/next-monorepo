@@ -12,7 +12,7 @@ export default function MemoryPage() {
   }, [resetTrip])
 
   return (
-    <div className="flex min-h-screen flex-col items-center py-16 bg-[#f5f4ed] p-4 font-serif">
+    <div className="flex min-h-screen flex-col items-center py-6 md:py-16 bg-[#f5f4ed] p-4 font-serif">
       <div className="w-full max-w-6xl space-y-12">
         <div className="space-y-4 text-center">
           <h1 className="text-4xl md:text-5xl font-medium text-slate-900 tracking-tight">

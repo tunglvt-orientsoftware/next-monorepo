@@ -88,7 +88,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#fdfcf8] p-6 md:p-12 font-serif">
+    <div className="min-h-screen bg-[#fdfcf8] p-4 pt-6 md:p-12 font-serif">
       <div className="max-w-6xl mx-auto space-y-12">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-4">
