@@ -78,7 +78,7 @@ export function ChatInput() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Where would you like to go?"
-          className="min-h-[60px] max-h-[200px] w-full resize-none border-0 shadow-none focus-visible:ring-0 text-base font-sans py-3 px-4"
+          className="min-h-[60px] max-h-[200px] w-full resize-none border-0 shadow-none focus-visible:ring-0 text-base font-sans py-3 px-4 text-slate-900 bg-white placeholder:text-slate-400 caret-[#c96442]"
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault()
