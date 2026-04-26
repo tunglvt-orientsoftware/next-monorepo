@@ -1,5 +1,11 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Dashboard',
+  description: 'Manage your travel itineraries and memories.',
+}
 
 export default async function DashboardPage() {
   const supabase = await createClient()

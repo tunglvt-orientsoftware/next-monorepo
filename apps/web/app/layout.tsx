@@ -13,6 +13,14 @@ const fontMono = Geist_Mono({
   variable: "--font-mono",
 })
 
+export const metadata = {
+  title: {
+    template: '%s | Travel AI',
+    default: 'Travel AI - Plan Your Next Trip',
+  },
+  description: 'AI-powered travel planning and memory sharing platform. Create itineraries, share trip memories, and explore public feeds.',
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{

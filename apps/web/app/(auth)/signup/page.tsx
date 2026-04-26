@@ -3,6 +3,12 @@ import { SubmitButton } from '@/components/auth/SubmitButton'
 import { Input } from '@workspace/ui/components/input'
 import { Label } from '@workspace/ui/components/label'
 import Link from 'next/link'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Sign Up',
+  description: 'Create a new Travel AI account to start planning your next journey.',
+}
 
 export default async function SignupPage({
   searchParams,

@@ -1,4 +1,10 @@
 import { ChatInput } from '@/components/itinerary/ChatInput'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Plan Itinerary',
+  description: 'Tell us about your dream destination, travel style, and interests. We will craft a personalized itinerary just for you.',
+}
 
 export default function ItineraryPage() {
   return (
