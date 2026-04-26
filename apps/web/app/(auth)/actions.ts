@@ -5,14 +5,23 @@ import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 
+function getBaseUrl() {
+  // 1. Explicit env var (set this on Vercel to your production URL)
+  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL
+  // 2. Vercel auto-provides this for preview & production deployments
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
+  // 3. Fallback to localhost for development
+  return 'http://localhost:3000'
+}
+
 export async function loginWithGoogle() {
   const supabase = await createClient()
-  const origin = (await headers()).get('origin')
+  const baseUrl = getBaseUrl()
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${origin}/auth/callback`,
+      redirectTo: `${baseUrl}/auth/callback`,
       queryParams: {
         access_type: 'offline',
         prompt: 'consent select_account',
@@ -47,7 +56,7 @@ export async function login(formData: FormData) {
 
 export async function signup(formData: FormData) {
   const supabase = await createClient()
-  const origin = (await headers()).get('origin')
+  const baseUrl = getBaseUrl()
 
   const data = {
     email: formData.get('email') as string,
@@ -58,7 +67,7 @@ export async function signup(formData: FormData) {
     email: data.email,
     password: data.password,
     options: {
-      emailRedirectTo: `${origin}/auth/callback`,
+      emailRedirectTo: `${baseUrl}/auth/callback`,
     }
   })
 
