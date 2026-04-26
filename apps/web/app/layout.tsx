@@ -35,7 +35,7 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <Navigation />
-          <main className="pt-16 md:pt-16 min-h-[calc(100vh-64px)]">
+          <main className="pt-0 md:pt-16 min-h-[calc(100vh-64px)]">
             {children}
           </main>
           <Footer />
