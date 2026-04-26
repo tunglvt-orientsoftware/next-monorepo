@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { User, UserPlus, Check, X, ArrowLeft } from 'lucide-react'
 import { Button } from '@workspace/ui/components/button'
 import Link from 'next/link'
+import { createNotification } from '@/lib/notifications'
 
 export default function InvitePage() {
   const { code } = useParams()
@@ -76,6 +77,14 @@ export default function InvitePage() {
       
     if (!error) {
       setFriendStatus('pending')
+      // Notify the target user about the friend request
+      await createNotification(
+        targetProfile.id,
+        'friend_request',
+        currentUser.id,
+        targetProfile.invite_code || null,
+        `wants to be your friend`
+      )
     }
     setActionLoading(false)
   }
@@ -94,6 +103,14 @@ export default function InvitePage() {
       
     if (!error) {
       setFriendStatus('accepted')
+      // Notify the requester that their friend request was accepted
+      await createNotification(
+        targetProfile.id,
+        'friend_accepted',
+        currentUser.id,
+        null,
+        `accepted your friend request`
+      )
     }
     setActionLoading(false)
   }

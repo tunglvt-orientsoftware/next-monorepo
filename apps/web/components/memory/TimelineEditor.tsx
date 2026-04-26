@@ -28,6 +28,7 @@ import { Button } from '@workspace/ui/components/button'
 import { Loader2, Check, MapPin, GripVertical, ImagePlus, UploadCloud, Paintbrush, Globe, Users } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { createNotification } from '@/lib/notifications'
 
 // Sortable Milestone Item Component
 function SortableMilestone({ milestone, updateMilestone, onAddImages }: { 
@@ -299,6 +300,39 @@ export function TimelineEditor({ tripId }: { tripId?: string }) {
       if (tripId) {
         router.push(`/my-memories/${tripId}`)
       } else {
+        // Notify all friends about the new trip (only for new trips, not edits)
+        try {
+          const { data: friends1 } = await supabase.from('friends').select('friend_id').eq('user_id', user.id).eq('status', 'accepted')
+          const { data: friends2 } = await supabase.from('friends').select('user_id').eq('friend_id', user.id).eq('status', 'accepted')
+          
+          const friendIds = [
+            ...(friends1?.map(f => f.friend_id) || []),
+            ...(friends2?.map(f => f.user_id) || [])
+          ]
+          
+          // Get the newly created trip ID
+          const { data: latestTrip } = await supabase
+            .from('trips')
+            .select('id')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single()
+          
+          if (latestTrip && friendIds.length > 0) {
+            await Promise.all(friendIds.map(friendId =>
+              createNotification(
+                friendId,
+                'new_trip',
+                user.id,
+                latestTrip.id,
+                `shared a new trip: "${tripTitle || 'Untitled Trip'}"`
+              )
+            ))
+          }
+        } catch (notifErr) {
+          console.error('Failed to send new trip notifications:', notifErr)
+        }
         router.push('/my-memories')
       }
     } catch (err) {

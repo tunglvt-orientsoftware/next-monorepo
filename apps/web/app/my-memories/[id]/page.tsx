@@ -6,6 +6,7 @@ import { MapPin, ArrowLeft, Camera, Navigation, X, Trash2, Heart } from 'lucide-
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
+import { createNotification } from '@/lib/notifications'
 
 import { ScrapbookTheme } from '@/components/memory/themes/ScrapbookTheme'
 import { MagazineTheme } from '@/components/memory/themes/MagazineTheme'
@@ -110,6 +111,16 @@ export default function TripViewPage() {
           trip_id: params.id,
           user_id: currentUser.id
         })
+      // Notify the trip owner about the like
+      if (trip?.user_id) {
+        await createNotification(
+          trip.user_id,
+          'trip_liked',
+          currentUser.id,
+          params.id as string,
+          `liked your trip "${trip.title || 'Untitled Trip'}"`
+        )
+      }
     }
   }
 

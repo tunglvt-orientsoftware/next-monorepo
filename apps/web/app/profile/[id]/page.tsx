@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { User, UserPlus, Check, ArrowLeft, Loader2 } from 'lucide-react'
 import { Button } from '@workspace/ui/components/button'
 import Link from 'next/link'
+import { createNotification } from '@/lib/notifications'
 
 export default function PublicProfilePage() {
   const { id } = useParams()
@@ -74,6 +75,14 @@ export default function PublicProfilePage() {
       
     if (!error) {
       setFriendStatus('pending')
+      // Notify the target user about the friend request
+      await createNotification(
+        targetProfile.id,
+        'friend_request',
+        currentUser.id,
+        targetProfile.id,
+        `wants to be your friend`
+      )
     }
     setActionLoading(false)
   }
