@@ -10,4 +10,15 @@ module.exports = {
     "**/.turbo/**",
     "**/coverage/**",
   ],
+  parserOptions: {
+    babelOptions: {
+      presets: [require.resolve("next/babel")],
+    },
+  },
+  plugins: ["react"],
+  rules: {
+    "@typescript-eslint/no-unused-vars": "warn",
+    "react/prop-types": "off",
+    "react/react-in-jsx-scope": "off",
+  },
 }

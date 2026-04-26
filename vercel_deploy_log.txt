@@ -1,0 +1,8 @@
+Retrieving project…
+Deploying tunglvt-orientsoftwares-projects/next-monorepo
+Uploading [--------------------] (0.0B/302.5MB)
+Uploading [=====---------------] (75.6MB/302.5MB)
+Uploading [==========----------] (151.3MB/302.5MB)
+Uploading [===============-----] (226.9MB/302.5MB)
+Uploading [====================] (302.5MB/302.5MB)
+Error: File size limit exceeded (100 MB)

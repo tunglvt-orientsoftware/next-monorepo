@@ -1,0 +1,6 @@
+.next
+**/.next
+.turbo
+node_modules
+**/node_modules
+.env*

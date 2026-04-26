@@ -24,5 +24,9 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "react-dropzone": "^15.0.0",
+    "zustand": "^5.0.12"
+  }
 }
