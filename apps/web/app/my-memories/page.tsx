@@ -73,7 +73,7 @@ export default function MyMemoriesPage() {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link href="/feed" className="w-full sm:w-auto">
+            <Link href="/dashboard" className="w-full sm:w-auto">
               <Button variant="outline" className="w-full sm:w-auto rounded-full h-12 px-6 font-sans border-slate-300">
                 <Users className="w-5 h-5 mr-2" />
                 Friends' Feed

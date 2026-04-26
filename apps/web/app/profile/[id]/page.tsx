@@ -86,8 +86,8 @@ export default function PublicProfilePage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#fdfcf8] font-serif space-y-4">
         <h1 className="text-2xl text-slate-900">Profile Not Found</h1>
-        <Link href="/feed">
-          <Button variant="outline" className="mt-4 rounded-full font-sans">Go to Feed</Button>
+        <Link href="/dashboard">
+          <Button variant="outline" className="mt-4 rounded-full font-sans">Go to Dashboard</Button>
         </Link>
       </div>
     )

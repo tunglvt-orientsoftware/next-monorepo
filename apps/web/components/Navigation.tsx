@@ -11,7 +11,6 @@ export function Navigation() {
     { name: 'Home', href: '/', icon: Home },
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'My Memories', href: '/my-memories', icon: ImageIcon },
-    { name: 'Feed', href: '/feed', icon: Compass },
     { name: 'Profile', href: '/profile', icon: User },
   ]
 

@@ -13,6 +13,10 @@ export async function loginWithGoogle() {
     provider: 'google',
     options: {
       redirectTo: `${origin}/auth/callback`,
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent select_account',
+      },
     },
   })
 

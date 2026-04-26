@@ -1,11 +1,11 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Public Feed',
-  description: 'Discover travel memories and itineraries shared by the community.',
+  title: 'Dashboard',
+  description: 'Manage your travel itineraries and memories.',
 }
 
-export default function FeedLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
