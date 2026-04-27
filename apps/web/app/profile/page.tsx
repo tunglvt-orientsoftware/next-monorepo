@@ -125,7 +125,11 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-[#fdfcf8] font-serif pb-24 md:pb-12">
       {/* Cover Photo Area */}
       <div className="h-64 md:h-80 w-full relative overflow-hidden bg-gradient-to-br from-[#e0cdc0] to-[#c96442]/20">
-        <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_1px_1px,#c96442_1px,transparent_0)] bg-[length:24px_24px]"></div>
+        {profile?.cover_url ? (
+          <Image src={profile.cover_url} alt="Cover" fill className="object-cover" unoptimized={typeof profile.cover_url === 'string' && (profile.cover_url.startsWith('blob:') || profile.cover_url.startsWith('data:'))} />
+        ) : (
+          <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_1px_1px,#c96442_1px,transparent_0)] bg-[length:24px_24px]"></div>
+        )}
         
         {/* Top actions */}
         <div className="absolute top-4 md:top-8 left-4 right-4 md:left-8 md:right-8 flex justify-between items-center z-10">
@@ -264,7 +268,7 @@ export default function ProfilePage() {
                 <div>
                   <label className="block text-xs font-sans font-semibold text-slate-500 uppercase tracking-wider mb-2">Your Invite Link</label>
                   <div className="flex items-center gap-2">
-                    <div className="flex-grow min-w-0 bg-slate-50 border border-slate-200 p-3.5 rounded-xl font-sans text-sm text-slate-600 break-all select-all">
+                    <div className="flex-grow min-w-0 bg-slate-50 border border-slate-200 p-3.5 rounded-xl font-sans text-sm text-slate-600 truncate select-all">
                       {inviteUrl}
                     </div>
                     <Button onClick={copyInviteLink} className="bg-[#c96442] hover:bg-[#b05537] text-white rounded-xl h-[50px] w-[50px] p-0 shadow-sm flex-shrink-0">

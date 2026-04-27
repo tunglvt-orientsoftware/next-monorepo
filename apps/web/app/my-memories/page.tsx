@@ -104,7 +104,7 @@ export default function MyMemoriesPage() {
               const coverImage = trip.cover_image || trip.milestones?.find((m: any) => m.images && m.images.length > 0)?.images[0]
               
               return (
-                <Link href={trip.is_draft ? `/my-memories/${trip.id}/edit` : `/my-memories/${trip.id}`} key={trip.id} className="group bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col block">
+                <Link href={trip.is_draft ? `/trip/${trip.id}/edit` : `/trip/${trip.id}?from=my-memories`} key={trip.id} className="group bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col block">
                   <div className="aspect-[4/3] bg-slate-100 relative overflow-hidden">
                     {coverImage ? (
                       <motion.img 

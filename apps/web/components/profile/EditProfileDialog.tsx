@@ -21,10 +21,14 @@ export function EditProfileDialog({ profile, open, onClose, onSave }: EditProfil
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || '')
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [coverUrl, setCoverUrl] = useState(profile?.cover_url || '')
+  const [coverPreview, setCoverPreview] = useState<string | null>(null)
+  const [coverFile, setCoverFile] = useState<File | null>(null)
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const coverInputRef = useRef<HTMLInputElement>(null)
 
   // Re-sync form fields when dialog opens or profile changes
   useEffect(() => {
@@ -35,6 +39,9 @@ export function EditProfileDialog({ profile, open, onClose, onSave }: EditProfil
       setAvatarUrl(profile.avatar_url || '')
       setAvatarPreview(null)
       setAvatarFile(null)
+      setCoverUrl(profile.cover_url || '')
+      setCoverPreview(null)
+      setCoverFile(null)
       setError(null)
     }
   }, [open, profile])
@@ -113,6 +120,76 @@ export function EditProfileDialog({ profile, open, onClose, onSave }: EditProfil
     }
   }
 
+  const handleCoverSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setError('Please select a valid image file')
+      return
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Image must be under 5MB')
+      return
+    }
+
+    setError(null)
+    setCoverFile(file)
+
+    // Create preview
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      setCoverPreview(reader.result as string)
+    }
+    reader.readAsDataURL(file)
+  }, [])
+
+  const uploadCover = async (userId: string): Promise<string | null> => {
+    if (!coverFile) return coverUrl
+
+    setUploading(true)
+    try {
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1200,
+        useWebWorker: true,
+      };
+      const compressedFile = await imageCompression(coverFile, options);
+
+      const supabase = createClient()
+      const fileExt = compressedFile.name.split('.').pop() || 'jpeg'
+      const fileName = `${userId}/cover.${fileExt}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('covers')
+        .upload(fileName, compressedFile, {
+          cacheControl: '3600',
+          upsert: true,
+        })
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError)
+        setError('Failed to upload cover image. Please try again.')
+        return null
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('covers')
+        .getPublicUrl(fileName)
+
+      return `${publicUrl}?t=${Date.now()}`
+    } catch (err) {
+      console.error('Upload failed:', err)
+      setError('Failed to upload cover image')
+      return null
+    } finally {
+      setUploading(false)
+    }
+  }
+
   const handleSave = async () => {
     setSaving(true)
     setError(null)
@@ -138,6 +215,17 @@ export function EditProfileDialog({ profile, open, onClose, onSave }: EditProfil
         finalAvatarUrl = uploadedUrl
       }
 
+      // Upload cover if changed
+      let finalCoverUrl = coverUrl
+      if (coverFile) {
+        const uploadedCoverUrl = await uploadCover(user.id)
+        if (uploadedCoverUrl === null) {
+          setSaving(false)
+          return
+        }
+        finalCoverUrl = uploadedCoverUrl
+      }
+
       // Update profile in database
       const { data: updatedProfile, error: updateError } = await supabase
         .from('profiles')
@@ -146,6 +234,7 @@ export function EditProfileDialog({ profile, open, onClose, onSave }: EditProfil
           username: username.trim() || null,
           bio: bio.trim() || null,
           avatar_url: finalAvatarUrl || null,
+          cover_url: finalCoverUrl || null,
         })
         .eq('id', user.id)
         .select()
@@ -176,6 +265,7 @@ export function EditProfileDialog({ profile, open, onClose, onSave }: EditProfil
   if (!open) return null
 
   const currentAvatar = avatarPreview || avatarUrl
+  const currentCover = coverPreview || coverUrl
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -188,16 +278,45 @@ export function EditProfileDialog({ profile, open, onClose, onSave }: EditProfil
       {/* Dialog Content */}
       <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl shadow-slate-900/10 animate-in zoom-in-95 fade-in-0 slide-in-from-bottom-4 duration-300 overflow-hidden">
         
-        {/* Header with gradient */}
-        <div className="relative h-28 bg-gradient-to-br from-[#c96442]/80 to-[#e0cdc0] overflow-hidden">
-          <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_1px_1px,#fff_1px,transparent_0)] bg-[length:20px_20px]" />
+        {/* Header with gradient or cover */}
+        <div className="relative h-36 bg-gradient-to-br from-[#c96442]/80 to-[#e0cdc0] overflow-hidden group">
+          {currentCover ? (
+            <Image
+              src={currentCover}
+              alt="Cover preview"
+              fill
+              className="object-cover"
+              unoptimized={currentCover.startsWith('blob:') || currentCover.startsWith('data:')}
+            />
+          ) : (
+            <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_1px_1px,#fff_1px,transparent_0)] bg-[length:20px_20px]" />
+          )}
+          <div className="absolute inset-0 bg-black/20" />
+          
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 bg-white/20 hover:bg-white/40 backdrop-blur-sm text-white p-2 rounded-full transition-colors"
+            className="absolute top-4 right-4 bg-black/20 hover:bg-black/40 backdrop-blur-sm text-white p-2 rounded-full transition-colors z-10"
           >
             <X className="w-4 h-4" />
           </button>
-          <h2 className="absolute bottom-4 left-6 text-xl font-serif font-medium text-white drop-shadow-sm">
+          
+          <button
+            type="button"
+            onClick={() => coverInputRef.current?.click()}
+            className="absolute top-4 left-4 bg-black/20 hover:bg-black/40 backdrop-blur-sm text-white px-3 py-1.5 rounded-full transition-colors z-10 text-xs font-sans flex items-center gap-1.5 opacity-0 group-hover:opacity-100"
+          >
+            <Camera className="w-3.5 h-3.5" />
+            Change Cover
+          </button>
+          <input
+            ref={coverInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleCoverSelect}
+            className="hidden"
+          />
+
+          <h2 className="absolute bottom-4 left-6 text-xl font-serif font-medium text-white drop-shadow-sm z-10">
             Edit Profile
           </h2>
         </div>

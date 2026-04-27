@@ -2,12 +2,23 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { Home, LayoutDashboard, Image as ImageIcon, User, Compass, Bell, Map } from 'lucide-react'
 import { useRealtimeNotifications } from '@/lib/useRealtimeNotifications'
+import { Suspense } from 'react'
 
 export function Navigation() {
+  return (
+    <Suspense fallback={null}>
+      <NavigationInner />
+    </Suspense>
+  )
+}
+
+function NavigationInner() {
   const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const from = searchParams.get('from')
 
   const navItems = [
     { name: 'Home', href: '/', icon: Home },
@@ -17,8 +28,8 @@ export function Navigation() {
     { name: 'Profile', href: '/profile', icon: User },
   ]
 
-  // Hide on landing and auth pages
-  const isPublicPage = pathname === '/' || pathname === '/login' || pathname === '/signup'
+  // Hide on landing, auth, and trip creation/editing pages
+  const isPublicPage = pathname === '/' || pathname === '/login' || pathname === '/signup' || pathname === '/memory' || pathname?.endsWith('/edit')
 
   // Realtime notification subscription
   const { unreadCount } = useRealtimeNotifications()
@@ -37,7 +48,11 @@ export function Navigation() {
         </Link>
         <nav className="flex items-center gap-1 flex-1 max-w-5xl">
           {navItems.map((item) => {
-            const isActive = pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href))
+            const isActive = pathname === item.href || 
+                             (item.href !== '/' && pathname?.startsWith(item.href) && !pathname?.startsWith('/trip')) ||
+                             (pathname?.startsWith('/trip') && item.href === '/dashboard' && from === 'dashboard') ||
+                             (pathname?.startsWith('/trip') && item.href === '/my-memories' && from === 'my-memories') ||
+                             (pathname?.startsWith('/trip') && item.href === '/profile' && from === 'profile')
             const Icon = item.icon
             return (
               <Link
@@ -77,7 +92,11 @@ export function Navigation() {
       {/* Bottom Navigation (Mobile) */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 w-full bg-white border-t border-slate-200 z-[100] px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom))] flex items-center justify-between shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
         {navItems.map((item) => {
-          const isActive = pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href))
+          const isActive = pathname === item.href || 
+                           (item.href !== '/' && pathname?.startsWith(item.href) && !pathname?.startsWith('/trip')) ||
+                           (pathname?.startsWith('/trip') && item.href === '/dashboard' && from === 'dashboard') ||
+                           (pathname?.startsWith('/trip') && item.href === '/my-memories' && from === 'my-memories') ||
+                           (pathname?.startsWith('/trip') && item.href === '/profile' && from === 'profile')
           const Icon = item.icon
           return (
             <Link

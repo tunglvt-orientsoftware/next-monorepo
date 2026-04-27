@@ -281,9 +281,17 @@ export default function DashboardPage() {
                 const coverImage = trip.milestones?.find((m: any) => m.images && m.images.length > 0)?.images[0]
                 
                 return (
-                  <Link href={`/my-memories/${trip.id}`} key={trip.id} className="group bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col">
+                  <Link href={`/trip/${trip.id}?from=dashboard`} key={trip.id} className="group bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col">
                     {/* Author Banner */}
-                    <div className="p-4 flex items-center gap-3 border-b border-slate-100 bg-slate-50/50">
+                    <div 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (trip.profiles?.id) {
+                          router.push(`/profile/${trip.profiles.id}`);
+                        }
+                      }}
+                      className="p-4 flex items-center gap-3 border-b border-slate-100 bg-slate-50/50 hover:bg-slate-100 transition-colors z-10"
+                    >
                       <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-200 border border-slate-300 flex-shrink-0">
                         {trip.profiles?.avatar_url ? (
                           <Image src={trip.profiles.avatar_url} alt="avatar" className="w-full h-full object-cover" width={100} height={100} unoptimized={typeof trip.profiles.avatar_url === 'string' && (trip.profiles.avatar_url.startsWith('blob:') || trip.profiles.avatar_url.startsWith('data:'))} />
