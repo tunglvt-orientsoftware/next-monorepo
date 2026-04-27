@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { Home, LayoutDashboard, Image as ImageIcon, User, Compass, Bell } from 'lucide-react'
+import { Home, LayoutDashboard, Image as ImageIcon, User, Compass, Bell, Map } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 export function Navigation() {
@@ -13,6 +13,7 @@ export function Navigation() {
   const navItems = [
     { name: 'Home', href: '/', icon: Home },
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'Plans', href: '/my-plans', icon: Map },
     { name: 'My Memories', href: '/my-memories', icon: ImageIcon },
     { name: 'Profile', href: '/profile', icon: User },
   ]

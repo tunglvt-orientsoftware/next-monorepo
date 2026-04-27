@@ -1,15 +1,22 @@
 'use client'
 
 import { TimelineEditor } from '@/components/memory/TimelineEditor'
-import { useEffect } from 'react'
+import { useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useTripStore } from '@/lib/store'
 
-export default function MemoryPage() {
+function MemoryContent() {
   const resetTrip = useTripStore(state => state.resetTrip)
+  const milestones = useTripStore(state => state.milestones)
+  const searchParams = useSearchParams()
 
   useEffect(() => {
-    resetTrip()
-  }, [resetTrip])
+    // Don't reset if coming from plan conversion (store already has data)
+    const fromPlan = searchParams.get('fromPlan')
+    if (!fromPlan || milestones.length === 0) {
+      resetTrip()
+    }
+  }, [resetTrip, searchParams, milestones.length])
 
   return (
     <div className="flex min-h-screen flex-col items-center py-16 bg-[#f5f4ed] p-4 font-serif">
@@ -26,5 +33,17 @@ export default function MemoryPage() {
         <TimelineEditor />
       </div>
     </div>
+  )
+}
+
+export default function MemoryPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#f5f4ed] flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-[#c96442] border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <MemoryContent />
+    </Suspense>
   )
 }
