@@ -50,8 +50,10 @@ export default function NotificationsPage() {
   const router = useRouter()
 
   useEffect(() => {
+    const supabase = createClient()
+    let channel: any = null
+
     async function fetchNotifications() {
-      const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
 
       if (!user) {
@@ -70,9 +72,55 @@ export default function NotificationsPage() {
         setNotifications(data as Notification[])
       }
       setIsLoading(false)
+
+      // Subscribe to realtime changes for this user's notifications
+      channel = supabase
+        .channel(`notifications-page:${user.id}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_id=eq.${user.id}`,
+          },
+          async (payload: any) => {
+            // Fetch full notification with actor info
+            const { data: newNotif } = await supabase
+              .from('notifications')
+              .select('*, actor:actor_id(id, full_name, avatar_url)')
+              .eq('id', payload.new.id)
+              .single()
+
+            if (newNotif) {
+              setNotifications(prev => [newNotif as Notification, ...prev])
+            }
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_id=eq.${user.id}`,
+          },
+          (payload: any) => {
+            setNotifications(prev =>
+              prev.map(n => n.id === payload.new.id ? { ...n, ...payload.new } : n)
+            )
+          }
+        )
+        .subscribe()
     }
 
     fetchNotifications()
+
+    return () => {
+      if (channel) {
+        supabase.removeChannel(channel)
+      }
+    }
   }, [router])
 
   const handleNotificationClick = async (notif: Notification) => {

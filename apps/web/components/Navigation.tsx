@@ -1,14 +1,13 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
 import { Home, LayoutDashboard, Image as ImageIcon, User, Compass, Bell, Map } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
+import { useRealtimeNotifications } from '@/lib/useRealtimeNotifications'
 
 export function Navigation() {
   const pathname = usePathname()
-  const [unreadCount, setUnreadCount] = useState(0)
 
   const navItems = [
     { name: 'Home', href: '/', icon: Home },
@@ -21,34 +20,8 @@ export function Navigation() {
   // Hide on landing and auth pages
   const isPublicPage = pathname === '/' || pathname === '/login' || pathname === '/signup'
 
-  // Poll for unread notifications
-  useEffect(() => {
-    if (isPublicPage) return
-
-    async function fetchUnread() {
-      try {
-        const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) return
-
-        const { count, error } = await supabase
-          .from('notifications')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id)
-          .eq('is_read', false)
-
-        if (!error && count !== null) {
-          setUnreadCount(count)
-        }
-      } catch {
-        // silently ignore on public pages or when not logged in
-      }
-    }
-
-    fetchUnread()
-    const interval = setInterval(fetchUnread, 30000) // Poll every 30s
-    return () => clearInterval(interval)
-  }, [pathname, isPublicPage])
+  // Realtime notification subscription
+  const { unreadCount } = useRealtimeNotifications()
 
   if (isPublicPage) return null
 
@@ -58,10 +31,10 @@ export function Navigation() {
     <>
       {/* Top Header Navigation (Desktop) */}
       <header className="hidden md:flex fixed top-0 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 z-50 h-16 items-center px-8">
-        <div className="flex items-center gap-2 font-serif text-xl font-bold text-[#c96442] mr-8">
-          <Compass className="w-6 h-6" />
-          <span>TravelAI</span>
-        </div>
+        <Link href="/dashboard" className="flex items-center gap-2 font-serif text-xl font-bold text-[#c96442] mr-8 hover:opacity-90 transition-opacity">
+          <Image src="/logo.png" alt="WanderLog Logo" width={28} height={28} className="object-contain" />
+          <span>WanderLog</span>
+        </Link>
         <nav className="flex items-center gap-1 flex-1 max-w-5xl">
           {navItems.map((item) => {
             const isActive = pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href))

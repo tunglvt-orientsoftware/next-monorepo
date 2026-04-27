@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { MapPin, ArrowLeft, Camera, Navigation, X, Trash2, Heart } from 'lucide-react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -47,11 +48,11 @@ export function PolaroidTheme({ trip, isOwner, hasLiked, likesCount, handleToggl
               >
                 <X className="w-6 h-6" />
               </button>
-              <img 
+              <Image 
                 src={selectedImage} 
                 alt="Enlarged" 
                 className="max-w-full max-h-[75vh] object-contain sepia-[0.3]" 
-              />
+              width={1200} height={1200} unoptimized={typeof selectedImage === 'string' && (selectedImage.startsWith('blob:') || selectedImage.startsWith('data:'))} />
               <div className="absolute bottom-6 left-0 right-0 text-center font-serif text-2xl text-slate-800 -rotate-1 opacity-80">
                 Memories...
               </div>
@@ -111,11 +112,11 @@ export function PolaroidTheme({ trip, isOwner, hasLiked, likesCount, handleToggl
               {/* Tape */}
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-32 h-8 bg-white/40 backdrop-blur-sm -rotate-2 border border-white/20 shadow-sm z-10" />
               
-              <img 
+              <Image 
                 src={coverImage} 
                 alt={trip.title} 
                 className="w-full aspect-[4/3] object-cover sepia-[0.3]"
-              />
+              width={1200} height={1200} unoptimized={typeof coverImage === 'string' && (coverImage.startsWith('blob:') || coverImage.startsWith('data:'))} />
               <div className="absolute bottom-6 md:bottom-8 left-0 right-0 text-center px-6">
                  <h1 className="text-4xl md:text-5xl font-serif text-slate-800 -rotate-2">
                   {trip.title || 'Untitled Trip'}
@@ -228,7 +229,7 @@ function PolaroidGallery({ images, onImageClick }: { images: string[], onImageCl
             {/* Tape */}
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-20 h-6 bg-amber-100/50 backdrop-blur-sm -rotate-3 border border-amber-200/20 shadow-sm z-10" />
             
-            <img src={img} alt={`Milestone ${idx+1}`} className="w-full aspect-square object-cover sepia-[0.4]" />
+            <Image src={img} alt={`Milestone ${idx+1}`} className="w-full aspect-square object-cover sepia-[0.4]" width={1200} height={1200} unoptimized={typeof img === 'string' && (img.startsWith('blob:') || img.startsWith('data:'))} />
             <div className="absolute bottom-6 left-0 right-0 text-center font-serif text-xl text-slate-700 opacity-80 -rotate-2">
               Photo {idx + 1}
             </div>

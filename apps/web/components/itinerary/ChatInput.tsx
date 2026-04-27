@@ -37,12 +37,15 @@ export function ChatInput() {
   const { submit, isLoading, object } = useObject({
     api: '/api/chat',
     schema: itinerarySchema,
+    headers: {
+      'Content-Type': 'application/json',
+    },
   })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!input.trim() || isLoading) return
-    submit({ prompt: input })
+    submit({ prompt: input, locale: typeof navigator !== 'undefined' ? navigator.language : 'en' })
     setCheckedItems({})
     setSaveSuccess(false)
   }

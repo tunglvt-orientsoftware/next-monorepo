@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { MapPin, ArrowLeft, Camera, Navigation, X, Trash2, Heart } from 'lucide-react'
 import Link from 'next/link'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
@@ -52,11 +53,11 @@ export function ScrapbookTheme({ trip, isOwner, hasLiked, likesCount, handleTogg
               >
                 <X className="w-6 h-6" />
               </button>
-              <img 
+              <Image 
                 src={selectedImage} 
                 alt="Enlarged" 
                 className="max-w-full max-h-[85vh] object-contain rounded-sm shadow-2xl" 
-              />
+              width={1200} height={1200} unoptimized={typeof selectedImage === 'string' && (selectedImage.startsWith('blob:') || selectedImage.startsWith('data:'))} />
             </motion.div>
           </motion.div>
         )}
@@ -250,7 +251,7 @@ function ScrapbookCollage({ images, onImageClick }: { images: string[], onImageC
         onClick={() => onImageClick(images[0]!)}
         className={`relative bg-white p-4 pb-16 shadow-2xl border border-slate-200 rotate-1 hover:rotate-0 hover:scale-105 transition-all duration-500 w-full max-w-xl mx-auto cursor-zoom-in`}
       >
-        <img src={images[0]} alt="Milestone" className="w-full aspect-[4/3] object-cover bg-slate-100" />
+        <Image src={images[0] || ""} alt="Milestone" className="w-full aspect-[4/3] object-cover bg-slate-100" width={1200} height={1200} unoptimized={typeof images[0] === "string" && (images[0].startsWith("blob:") || images[0].startsWith("data:"))} />
         <div className="absolute bottom-5 left-0 right-0 text-center font-sans text-slate-400 opacity-60 italic text-sm">Moment captured</div>
       </div>
     )
@@ -263,13 +264,13 @@ function ScrapbookCollage({ images, onImageClick }: { images: string[], onImageC
           onClick={() => onImageClick(images[0]!)}
           className="absolute top-0 left-0 w-3/4 bg-white p-3 pb-12 shadow-xl border border-slate-200 -rotate-3 hover:rotate-0 hover:scale-105 hover:z-30 transition-all duration-500 z-10 cursor-zoom-in"
         >
-          <img src={images[0]} alt="Milestone 1" className="w-full aspect-square object-cover" />
+          <Image src={images[0] || ""} alt="Milestone 1" className="w-full aspect-square object-cover" width={1200} height={1200} unoptimized={typeof images[0] === "string" && (images[0].startsWith("blob:") || images[0].startsWith("data:"))} />
         </div>
         <div 
           onClick={() => onImageClick(images[1]!)}
           className="absolute bottom-0 right-0 w-3/4 bg-white p-3 pb-12 shadow-2xl border border-slate-200 rotate-6 hover:rotate-0 hover:scale-105 hover:z-30 transition-all duration-500 z-20 cursor-zoom-in"
         >
-          <img src={images[1]} alt="Milestone 2" className="w-full aspect-square object-cover" />
+          <Image src={images[1] || ""} alt="Milestone 2" className="w-full aspect-square object-cover" width={1200} height={1200} unoptimized={typeof images[1] === "string" && (images[1].startsWith("blob:") || images[1].startsWith("data:"))} />
         </div>
       </div>
     )
@@ -288,7 +289,7 @@ function ScrapbookCollage({ images, onImageClick }: { images: string[], onImageC
             className={`absolute ${positions[idx % 4]} w-2/3 bg-white p-3 pb-12 shadow-xl border border-slate-200 ${rotations[idx % 4]} hover:rotate-0 hover:z-50 hover:scale-110 transition-all duration-500 cursor-zoom-in`}
             style={{ zIndex: idx }}
           >
-            <img src={img} alt={`Milestone ${idx+1}`} className="w-full aspect-square object-cover" />
+            <Image src={img} alt={`Milestone ${idx+1}`} className="w-full aspect-square object-cover" width={1200} height={1200} unoptimized={typeof img === 'string' && (img.startsWith('blob:') || img.startsWith('data:'))} />
           </div>
         )
       })}

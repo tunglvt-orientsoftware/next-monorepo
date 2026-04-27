@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -47,7 +48,7 @@ export default function LandingPage() {
                 <Button variant="ghost" className="font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100/50 flex items-center gap-2 rounded-full px-4 py-2 border border-slate-200">
                   <div className="w-6 h-6 bg-slate-100 rounded-full overflow-hidden flex items-center justify-center">
                     {userProfile.avatar_url ? (
-                      <img src={userProfile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                      <Image src={userProfile.avatar_url} alt="Avatar" className="w-full h-full object-cover" width={1200} height={1200} unoptimized={typeof userProfile.avatar_url === 'string' && (userProfile.avatar_url.startsWith('blob:') || userProfile.avatar_url.startsWith('data:'))} />
                     ) : (
                       <User className="w-4 h-4 text-slate-400" />
                     )}

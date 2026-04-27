@@ -13,10 +13,10 @@ function MemoryContent() {
   useEffect(() => {
     // Don't reset if coming from plan conversion (store already has data)
     const fromPlan = searchParams.get('fromPlan')
-    if (!fromPlan || milestones.length === 0) {
+    if (!fromPlan) {
       resetTrip()
     }
-  }, [resetTrip, searchParams, milestones.length])
+  }, [resetTrip, searchParams])
 
   return (
     <div className="flex min-h-screen flex-col items-center py-16 bg-[#f5f4ed] p-4 font-serif">

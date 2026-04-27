@@ -46,7 +46,7 @@ export default function EditTripPage() {
         tripStory: data.story || '',
         theme: data.theme || 'scrapbook',
         coverImage: data.cover_image || null,
-        isPublic: data.is_public || false,
+        visibility: data.visibility || 'friends',
         milestones: data.milestones || []
       })
       

@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { MapPin, ArrowLeft, Camera, X, Trash2, Heart } from 'lucide-react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -48,11 +49,11 @@ export function ClassicTheme({ trip, isOwner, hasLiked, likesCount, handleToggle
                 <X className="w-6 h-6" />
               </button>
               <div className="p-4 border-8 border-double border-slate-900 bg-white shadow-2xl max-h-[90vh]">
-                <img 
+                <Image 
                   src={selectedImage} 
                   alt="Enlarged" 
                   className="max-w-full max-h-[80vh] object-contain grayscale-[30%] contrast-125" 
-                />
+                width={1200} height={1200} unoptimized={typeof selectedImage === 'string' && (selectedImage.startsWith('blob:') || selectedImage.startsWith('data:'))} />
               </div>
             </motion.div>
           </motion.div>
@@ -125,11 +126,11 @@ export function ClassicTheme({ trip, isOwner, hasLiked, likesCount, handleToggle
               transition={{ delay: 0.2 }}
               className="w-full max-w-4xl mx-auto mb-16 p-2 bg-white border-4 border-double border-slate-900 shadow-xl relative"
             >
-              <img 
+              <Image 
                 src={coverImage} 
                 alt={trip.title} 
                 className="w-full h-[60vh] object-cover grayscale-[20%] contrast-125"
-              />
+              width={1200} height={1200} unoptimized={typeof coverImage === 'string' && (coverImage.startsWith('blob:') || coverImage.startsWith('data:'))} />
               <div className="absolute -bottom-4 right-8 bg-white px-4 border-2 border-slate-900 text-xs font-bold uppercase tracking-widest">
                 Fig 1. Cover
               </div>
@@ -217,7 +218,7 @@ function ClassicGallery({ images, onImageClick, index }: { images: string[], onI
           onClick={() => onImageClick(images[0]!)}
           className="relative w-full aspect-[4/3] overflow-hidden cursor-zoom-in"
         >
-          <img src={images[0]} alt="Milestone" className="w-full h-full object-cover grayscale-[20%] contrast-125 group-hover:scale-105 transition-transform duration-700" />
+          <Image src={images[0] || ""} alt="Milestone" className="w-full h-full object-cover grayscale-[20%] contrast-125 group-hover:scale-105 transition-transform duration-700" width={1200} height={1200} unoptimized={typeof images[0] === "string" && (images[0].startsWith("blob:") || images[0].startsWith("data:"))} />
         </div>
         <div className="absolute -bottom-3 right-4 bg-white px-2 text-[10px] font-bold uppercase tracking-widest text-slate-500">
           Plate {index + 1}.A
@@ -235,7 +236,7 @@ function ClassicGallery({ images, onImageClick, index }: { images: string[], onI
               onClick={() => onImageClick(img)}
               className="relative w-full aspect-[3/4] overflow-hidden cursor-zoom-in"
             >
-              <img src={img} alt={`Milestone ${i}`} className="w-full h-full object-cover grayscale-[20%] contrast-125 group-hover:scale-105 transition-transform duration-700" />
+              <Image src={img} alt={`Milestone ${i}`} className="w-full h-full object-cover grayscale-[20%] contrast-125 group-hover:scale-105 transition-transform duration-700" width={1200} height={1200} unoptimized={typeof img === 'string' && (img.startsWith('blob:') || img.startsWith('data:'))} />
             </div>
           </div>
         ))}
@@ -251,7 +252,7 @@ function ClassicGallery({ images, onImageClick, index }: { images: string[], onI
           onClick={() => onImageClick(images[0]!)}
           className="relative w-full aspect-[16/9] overflow-hidden cursor-zoom-in"
         >
-          <img src={images[0]} alt="Milestone 1" className="w-full h-full object-cover grayscale-[20%] contrast-125 group-hover:scale-105 transition-transform duration-700" />
+          <Image src={images[0] || ""} alt="Milestone 1" className="w-full h-full object-cover grayscale-[20%] contrast-125 group-hover:scale-105 transition-transform duration-700" width={1200} height={1200} unoptimized={typeof images[0] === "string" && (images[0].startsWith("blob:") || images[0].startsWith("data:"))} />
         </div>
       </div>
       {/* Smaller Images below */}
@@ -261,7 +262,7 @@ function ClassicGallery({ images, onImageClick, index }: { images: string[], onI
             onClick={() => onImageClick(img)}
             className="relative w-full aspect-square overflow-hidden cursor-zoom-in"
           >
-            <img src={img} alt={`Milestone ${i + 1}`} className="w-full h-full object-cover grayscale-[20%] contrast-125 group-hover:scale-105 transition-transform duration-700" />
+            <Image src={img} alt={`Milestone ${i + 1}`} className="w-full h-full object-cover grayscale-[20%] contrast-125 group-hover:scale-105 transition-transform duration-700" width={1200} height={1200} unoptimized={typeof img === 'string' && (img.startsWith('blob:') || img.startsWith('data:'))} />
           </div>
         </div>
       ))}

@@ -1,8 +1,9 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { Compass, Mail, Globe, Code } from 'lucide-react'
+import { Mail, Globe, Code } from 'lucide-react'
 
 export function Footer() {
   const pathname = usePathname()
@@ -19,12 +20,10 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10 md:gap-8 mb-12">
           
           <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="flex items-center gap-2 mb-4 group">
-              <div className="w-8 h-8 rounded-lg bg-white shadow-sm border border-[#c96442]/20 flex items-center justify-center group-hover:scale-105 transition-transform">
-                <Compass className="h-4 w-4 text-[#c96442]" />
-              </div>
+            <Link href="/" className="flex items-center gap-2 mb-4 group hover:opacity-90 transition-opacity">
+              <Image src="/logo.png" alt="WanderLog Logo" width={28} height={28} className="object-contain" />
               <span className="font-serif text-xl font-medium tracking-tight text-slate-900">
-                Travel AI
+                WanderLog
               </span>
             </Link>
             <p className="text-slate-500 text-sm leading-relaxed mb-6">
@@ -128,7 +127,7 @@ export function Footer() {
 
         <div className="pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-between md:items-center items-start gap-4">
           <p className="text-slate-400 text-sm">
-            © {new Date().getFullYear()} TravelAI. All rights reserved.
+            © {new Date().getFullYear()} WanderLog. All rights reserved.
           </p>
           <div className="flex items-center gap-2 text-sm text-slate-400">
             <span>Made with</span>

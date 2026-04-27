@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useParams, useRouter } from 'next/navigation'
-import { User, UserPlus, Check, X, ArrowLeft } from 'lucide-react'
+import { User, UserPlus, UserMinus, Check, X, ArrowLeft } from 'lucide-react'
 import { Button } from '@workspace/ui/components/button'
 import Link from 'next/link'
 import { createNotification } from '@/lib/notifications'
@@ -134,6 +134,26 @@ export default function InvitePage() {
     setActionLoading(false)
   }
 
+  const handleUnfriend = async () => {
+    if (!currentUser) return
+    
+    if (!confirm('Are you sure you want to unfriend this user?')) return;
+    
+    setActionLoading(true)
+    const supabase = createClient()
+    
+    const { error } = await supabase
+      .from('friends')
+      .delete()
+      .or(`and(user_id.eq.${currentUser.id},friend_id.eq.${targetProfile.id}),and(user_id.eq.${targetProfile.id},friend_id.eq.${currentUser.id})`)
+      
+    if (!error) {
+      setFriendStatus(null)
+      setIsReceiver(false)
+    }
+    setActionLoading(false)
+  }
+
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center bg-[#fdfcf8]"><div className="w-8 h-8 border-4 border-[#c96442] border-t-transparent rounded-full animate-spin" /></div>
   }
@@ -177,9 +197,14 @@ export default function InvitePage() {
               This is your own invite link.
             </div>
           ) : friendStatus === 'accepted' ? (
-            <div className="bg-green-50 text-green-700 font-sans p-4 rounded-2xl border border-green-200 flex items-center justify-center">
-              <Check className="w-5 h-5 mr-2" />
-              You are friends
+            <div className="flex gap-2">
+              <div className="flex-1 bg-green-50 text-green-700 font-sans p-4 rounded-2xl border border-green-200 flex items-center justify-center">
+                <Check className="w-5 h-5 mr-2" />
+                You are friends
+              </div>
+              <Button onClick={handleUnfriend} disabled={actionLoading} variant="outline" className="w-14 h-14 rounded-2xl flex-shrink-0 text-red-500 hover:text-red-600 hover:bg-red-50 border-red-200">
+                <UserMinus className="w-5 h-5" />
+              </Button>
             </div>
           ) : friendStatus === 'pending' ? (
             <div className="space-y-4">

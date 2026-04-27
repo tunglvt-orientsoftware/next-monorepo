@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { MapPin, ArrowLeft, Camera, Navigation, X, Trash2, Heart } from 'lucide-react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -47,11 +48,11 @@ export function MagazineTheme({ trip, isOwner, hasLiked, likesCount, handleToggl
               >
                 <X className="w-8 h-8 stroke-[1.5]" />
               </button>
-              <img 
+              <Image 
                 src={selectedImage} 
                 alt="Enlarged" 
                 className="max-w-full max-h-[85vh] object-contain shadow-2xl" 
-              />
+              width={1200} height={1200} unoptimized={typeof selectedImage === 'string' && (selectedImage.startsWith('blob:') || selectedImage.startsWith('data:'))} />
             </motion.div>
           </motion.div>
         )}
@@ -125,11 +126,11 @@ export function MagazineTheme({ trip, isOwner, hasLiked, likesCount, handleToggl
               transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
               className="lg:col-span-7 h-[60vh] md:h-[80vh] w-full"
             >
-              <img 
+              <Image 
                 src={coverImage} 
                 alt={trip.title} 
                 className="w-full h-full object-cover grayscale-[20%] contrast-125"
-              />
+              width={1200} height={1200} unoptimized={typeof coverImage === 'string' && (coverImage.startsWith('blob:') || coverImage.startsWith('data:'))} />
             </motion.div>
           )}
         </div>
@@ -194,11 +195,11 @@ function MagazineGallery({ images, onImageClick }: { images: string[], onImageCl
         onClick={() => onImageClick(images[0]!)}
         className="w-full aspect-[4/5] overflow-hidden cursor-zoom-in group"
       >
-        <img 
-          src={images[0]} 
+        <Image 
+          src={images[0] || ""} 
           alt="Milestone" 
           className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" 
-        />
+        width={1200} height={1200} unoptimized={typeof images[0] === "string" && (images[0].startsWith("blob:") || images[0].startsWith("data:"))} />
       </div>
     )
   }
@@ -210,13 +211,13 @@ function MagazineGallery({ images, onImageClick }: { images: string[], onImageCl
           onClick={() => onImageClick(images[0]!)}
           className="w-full h-full overflow-hidden cursor-zoom-in group mt-12"
         >
-          <img src={images[0]} alt="Milestone 1" className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" />
+          <Image src={images[0] || ""} alt="Milestone 1" className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" width={1200} height={1200} unoptimized={typeof images[0] === "string" && (images[0].startsWith("blob:") || images[0].startsWith("data:"))} />
         </div>
         <div 
           onClick={() => onImageClick(images[1]!)}
           className="w-full h-full overflow-hidden cursor-zoom-in group mb-12"
         >
-          <img src={images[1]} alt="Milestone 2" className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" />
+          <Image src={images[1] || ""} alt="Milestone 2" className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" width={1200} height={1200} unoptimized={typeof images[1] === "string" && (images[1].startsWith("blob:") || images[1].startsWith("data:"))} />
         </div>
       </div>
     )
@@ -228,21 +229,21 @@ function MagazineGallery({ images, onImageClick }: { images: string[], onImageCl
         onClick={() => onImageClick(images[0]!)}
         className="col-span-12 md:col-span-8 h-full overflow-hidden cursor-zoom-in group"
       >
-        <img src={images[0]} alt="Milestone 1" className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" />
+        <Image src={images[0] || ""} alt="Milestone 1" className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" width={1200} height={1200} unoptimized={typeof images[0] === "string" && (images[0].startsWith("blob:") || images[0].startsWith("data:"))} />
       </div>
       <div className="col-span-12 md:col-span-4 flex flex-col gap-4 h-full">
         <div 
           onClick={() => onImageClick(images[1]!)}
           className="h-1/2 overflow-hidden cursor-zoom-in group"
         >
-          <img src={images[1]} alt="Milestone 2" className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" />
+          <Image src={images[1] || ""} alt="Milestone 2" className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" width={1200} height={1200} unoptimized={typeof images[1] === "string" && (images[1].startsWith("blob:") || images[1].startsWith("data:"))} />
         </div>
         {images[2] && (
           <div 
             onClick={() => onImageClick(images[2]!)}
             className="h-1/2 overflow-hidden cursor-zoom-in group"
           >
-            <img src={images[2]} alt="Milestone 3" className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" />
+            <Image src={images[2] || ""} alt="Milestone 3" className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" width={1200} height={1200} unoptimized={typeof images[2] === "string" && (images[2].startsWith("blob:") || images[2].startsWith("data:"))} />
           </div>
         )}
       </div>

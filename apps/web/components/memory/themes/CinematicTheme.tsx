@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { MapPin, ArrowLeft, Camera, X, Trash2, Heart, Film } from 'lucide-react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -47,11 +48,11 @@ export function CinematicTheme({ trip, isOwner, hasLiked, likesCount, handleTogg
               >
                 <X className="w-6 h-6" />
               </button>
-              <img 
+              <Image 
                 src={selectedImage} 
                 alt="Enlarged" 
                 className="max-w-full max-h-[90vh] object-contain shadow-[0_0_100px_rgba(255,255,255,0.05)]" 
-              />
+              width={1200} height={1200} unoptimized={typeof selectedImage === 'string' && (selectedImage.startsWith('blob:') || selectedImage.startsWith('data:'))} />
             </motion.div>
           </motion.div>
         )}
@@ -143,11 +144,11 @@ export function CinematicTheme({ trip, isOwner, hasLiked, likesCount, handleTogg
                 <div className="absolute top-0 left-0 w-full h-[5%] bg-black z-20"></div>
                 <div className="absolute bottom-0 left-0 w-full h-[5%] bg-black z-20"></div>
                 
-                <img 
+                <Image 
                   src={coverImage} 
                   alt={trip.title} 
                   className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-1000 scale-105 group-hover:scale-100"
-                />
+                width={1200} height={1200} unoptimized={typeof coverImage === 'string' && (coverImage.startsWith('blob:') || coverImage.startsWith('data:'))} />
                 
                 {/* Vignette */}
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.8)_100%)] pointer-events-none z-10" />
@@ -228,7 +229,7 @@ function CinematicGallery({ images, onImageClick }: { images: string[], onImageC
         className="relative w-full aspect-[21/9] bg-black overflow-hidden cursor-zoom-in group"
       >
         <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-700 z-10" />
-        <img src={images[0]} alt="Scene" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 scale-105 group-hover:scale-100 transition-all duration-1000 ease-out" />
+        <Image src={images[0] || ""} alt="Scene" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 scale-105 group-hover:scale-100 transition-all duration-1000 ease-out" width={1200} height={1200} unoptimized={typeof images[0] === "string" && (images[0].startsWith("blob:") || images[0].startsWith("data:"))} />
       </div>
     )
   }
@@ -243,7 +244,7 @@ function CinematicGallery({ images, onImageClick }: { images: string[], onImageC
             className="relative w-full aspect-[16/9] bg-black overflow-hidden cursor-zoom-in group"
           >
             <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-700 z-10" />
-            <img src={img} alt={`Scene ${i}`} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 scale-105 group-hover:scale-100 transition-all duration-1000 ease-out" />
+            <Image src={img} alt={`Scene ${i}`} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 scale-105 group-hover:scale-100 transition-all duration-1000 ease-out" width={1200} height={1200} unoptimized={typeof img === 'string' && (img.startsWith('blob:') || img.startsWith('data:'))} />
           </div>
         ))}
       </div>
@@ -258,7 +259,7 @@ function CinematicGallery({ images, onImageClick }: { images: string[], onImageC
         className="relative w-full aspect-[21/9] bg-black overflow-hidden cursor-zoom-in group"
       >
         <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-700 z-10" />
-        <img src={images[0]} alt="Main Scene" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 scale-105 group-hover:scale-100 transition-all duration-1000 ease-out" />
+        <Image src={images[0] || ""} alt="Main Scene" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 scale-105 group-hover:scale-100 transition-all duration-1000 ease-out" width={1200} height={1200} unoptimized={typeof images[0] === "string" && (images[0].startsWith("blob:") || images[0].startsWith("data:"))} />
       </div>
       
       {/* Split secondary images */}
@@ -270,7 +271,7 @@ function CinematicGallery({ images, onImageClick }: { images: string[], onImageC
             className="relative w-full aspect-[16/9] bg-black overflow-hidden cursor-zoom-in group"
           >
             <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-700 z-10" />
-            <img src={img} alt={`B-Roll ${i + 1}`} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 scale-105 group-hover:scale-100 transition-all duration-1000 ease-out" />
+            <Image src={img} alt={`B-Roll ${i + 1}`} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 scale-105 group-hover:scale-100 transition-all duration-1000 ease-out" width={1200} height={1200} unoptimized={typeof img === 'string' && (img.startsWith('blob:') || img.startsWith('data:'))} />
           </div>
         ))}
       </div>

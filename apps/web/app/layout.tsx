@@ -15,10 +15,25 @@ const fontMono = Geist_Mono({
 
 export const metadata = {
   title: {
-    template: '%s | Travel AI',
-    default: 'Travel AI - Plan Your Next Trip',
+    template: '%s | WanderLog',
+    default: 'WanderLog - Your stories, beautifully crafted.',
   },
-  description: 'AI-powered travel planning and memory sharing platform. Create itineraries, share trip memories, and explore public feeds.',
+  description: 'Your stories, beautifully crafted. Your journeys, perfectly planned. AI-powered travel planning and memory sharing platform.',
+  openGraph: {
+    title: 'WanderLog',
+    description: 'Your stories, beautifully crafted. Your journeys, perfectly planned.',
+    url: 'https://wanderlog.app', // placeholder for actual url
+    siteName: 'WanderLog',
+    images: [
+      {
+        url: '/logo.png',
+        width: 800,
+        height: 600,
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
 }
 
 export default function RootLayout({

@@ -1,18 +1,21 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import Image from 'next/image'
+import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { QRCodeSVG } from 'qrcode.react'
 import { User, Copy, Users, LogOut, Check, MapPin, Compass, Settings, Edit3, Camera } from 'lucide-react'
 import { Button } from '@workspace/ui/components/button'
 import Link from 'next/link'
+import { EditProfileDialog } from '@/components/profile/EditProfileDialog'
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
   const [origin, setOrigin] = useState('')
+  const [editOpen, setEditOpen] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -108,6 +111,10 @@ export default function ProfilePage() {
     router.push('/login')
   }
 
+  const handleProfileUpdate = (updatedProfile: any) => {
+    setProfile(updatedProfile)
+  }
+
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center bg-[#fdfcf8]"><div className="w-8 h-8 border-4 border-[#c96442] border-t-transparent rounded-full animate-spin" /></div>
   }
@@ -140,13 +147,16 @@ export default function ProfilePage() {
               <div className="w-32 h-32 md:w-40 md:h-40 bg-white p-2 rounded-full shadow-lg shadow-slate-200/50 flex-shrink-0 -mt-16 md:-mt-20 border-2 border-[#fdfcf8]">
                 <div className="w-full h-full rounded-full bg-slate-100 overflow-hidden flex items-center justify-center relative">
                   {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                    <Image src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" width={1200} height={1200} unoptimized={typeof profile.avatar_url === 'string' && (profile.avatar_url.startsWith('blob:') || profile.avatar_url.startsWith('data:'))} />
                   ) : (
                     <User className="w-16 h-16 text-slate-300" />
                   )}
                 </div>
               </div>
-              <button className="absolute bottom-2 right-2 bg-white p-2 rounded-full shadow-md text-slate-600 hover:text-[#c96442] border border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button 
+                onClick={() => setEditOpen(true)}
+                className="absolute bottom-2 right-2 bg-white p-2 rounded-full shadow-md text-slate-600 hover:text-[#c96442] border border-slate-100 opacity-0 group-hover:opacity-100 transition-all hover:scale-110 active:scale-95 cursor-pointer"
+              >
                 <Camera className="w-4 h-4" />
               </button>
             </div>
@@ -163,7 +173,11 @@ export default function ProfilePage() {
                   </p>
                 </div>
                 
-                <Button variant="outline" className="rounded-full font-sans gap-2 mx-auto md:mx-0 shrink-0">
+                <Button 
+                  variant="outline" 
+                  className="rounded-full font-sans gap-2 mx-auto md:mx-0 shrink-0 cursor-pointer hover:bg-[#c96442]/5 hover:border-[#c96442]/30 hover:text-[#c96442] transition-all"
+                  onClick={() => setEditOpen(true)}
+                >
                   <Edit3 className="w-4 h-4" />
                   Edit Profile
                 </Button>
@@ -197,7 +211,10 @@ export default function ProfilePage() {
               </h3>
               <ul className="space-y-3 font-sans text-sm">
                 <li>
-                  <button className="text-slate-600 hover:text-[#c96442] transition-colors flex items-center justify-between w-full">
+                  <button 
+                    onClick={() => setEditOpen(true)}
+                    className="text-slate-600 hover:text-[#c96442] transition-colors flex items-center justify-between w-full cursor-pointer"
+                  >
                     Personal Information
                   </button>
                 </li>
@@ -267,6 +284,16 @@ export default function ProfilePage() {
 
         </div>
       </div>
+
+      {/* Edit Profile Dialog */}
+      {profile && (
+        <EditProfileDialog
+          profile={profile}
+          open={editOpen}
+          onClose={() => setEditOpen(false)}
+          onSave={handleProfileUpdate}
+        />
+      )}
     </div>
   )
 }

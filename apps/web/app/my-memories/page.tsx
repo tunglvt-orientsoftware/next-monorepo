@@ -104,7 +104,7 @@ export default function MyMemoriesPage() {
               const coverImage = trip.cover_image || trip.milestones?.find((m: any) => m.images && m.images.length > 0)?.images[0]
               
               return (
-                <Link href={`/my-memories/${trip.id}`} key={trip.id} className="group bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col block">
+                <Link href={trip.is_draft ? `/my-memories/${trip.id}/edit` : `/my-memories/${trip.id}`} key={trip.id} className="group bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col block">
                   <div className="aspect-[4/3] bg-slate-100 relative overflow-hidden">
                     {coverImage ? (
                       <motion.img 
@@ -118,17 +118,24 @@ export default function MyMemoriesPage() {
                         <MapPin className="w-12 h-12 opacity-50" />
                       </div>
                     )}
-                    <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
-                      <div className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-sans font-medium text-slate-700 shadow-sm">
-                        {trip.milestones.length} Milestones
+                    <div className="absolute top-4 right-4 flex flex-col gap-2 items-end z-10">
+                      {trip.is_draft && (
+                        <div className="bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-sans font-bold shadow-sm uppercase tracking-wider">
+                          Draft
+                        </div>
+                      )}
+                      <div className="flex items-center gap-2">
+                        <div className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-sans font-medium text-slate-700 shadow-sm">
+                          {trip.milestones?.length || 0} Milestones
+                        </div>
+                        <button
+                          onClick={(e) => handleDelete(e, trip.id)}
+                          className="bg-white/90 hover:bg-red-500 hover:text-white text-slate-700 p-1.5 rounded-full backdrop-blur-sm transition-colors shadow-sm"
+                          title="Delete Trip"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
-                      <button
-                        onClick={(e) => handleDelete(e, trip.id)}
-                        className="bg-white/90 hover:bg-red-500 hover:text-white text-slate-700 p-1.5 rounded-full backdrop-blur-sm transition-colors shadow-sm"
-                        title="Delete Trip"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
                     </div>
                   </div>
                   

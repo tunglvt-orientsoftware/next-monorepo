@@ -16,15 +16,15 @@ export async function generateMetadata(
   
   const supabase = await createClient()
   
-  const { data: trip } = await supabase
-    .from('trips')
-    .select('title, story, cover_image')
+  const { data: plan } = await supabase
+    .from('plans')
+    .select('title, prompt')
     .eq('id', id)
     .single()
 
-  if (!trip) {
+  if (!plan) {
     return {
-      title: 'Trip Not Found',
+      title: 'Plan Not Found',
     }
   }
 
@@ -32,14 +32,12 @@ export async function generateMetadata(
   const previousImages = (await parent).openGraph?.images || []
 
   return {
-    title: trip.title || 'Untitled Trip',
-    description: trip.story ? trip.story.slice(0, 160) : 'A beautiful travel memory shared on WanderLog.',
+    title: plan.title || 'Untitled Plan',
+    description: plan.prompt ? plan.prompt.slice(0, 160) : 'An AI-generated travel plan on WanderLog.',
     openGraph: {
-      title: trip.title || 'Untitled Trip',
-      description: trip.story ? trip.story.slice(0, 160) : 'A beautiful travel memory shared on WanderLog.',
-      images: trip.cover_image 
-        ? [{ url: trip.cover_image, width: 1200, height: 630 }]
-        : previousImages,
+      title: plan.title || 'Untitled Plan',
+      description: plan.prompt ? plan.prompt.slice(0, 160) : 'An AI-generated travel plan on WanderLog.',
+      images: previousImages,
     },
   }
 }

@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { MapPin, ArrowLeft, Camera, Navigation, X, Trash2, Heart, Sun } from 'lucide-react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -47,11 +48,11 @@ export function SummerTheme({ trip, isOwner, hasLiked, likesCount, handleToggleL
               >
                 <X className="w-6 h-6" />
               </button>
-              <img 
+              <Image 
                 src={selectedImage} 
                 alt="Enlarged" 
                 className="max-w-full max-h-[85vh] object-contain rounded-[2rem] shadow-[0_20px_50px_rgba(251,191,36,0.3)] border-4 border-white" 
-              />
+              width={1200} height={1200} unoptimized={typeof selectedImage === 'string' && (selectedImage.startsWith('blob:') || selectedImage.startsWith('data:'))} />
             </motion.div>
           </motion.div>
         )}
@@ -124,11 +125,11 @@ export function SummerTheme({ trip, isOwner, hasLiked, likesCount, handleToggleL
               transition={{ delay: 0.2 }}
               className="w-full max-w-4xl mx-auto h-[50vh] md:h-[60vh] mb-12 rounded-[3rem] overflow-hidden shadow-2xl relative border-8 border-white transform hover:scale-[1.02] transition-transform duration-500"
             >
-              <img 
+              <Image 
                 src={coverImage} 
                 alt={trip.title} 
                 className="w-full h-full object-cover saturate-150"
-              />
+              width={1200} height={1200} unoptimized={typeof coverImage === 'string' && (coverImage.startsWith('blob:') || coverImage.startsWith('data:'))} />
             </motion.div>
           )}
 
@@ -228,7 +229,7 @@ function SummerGallery({ images, onImageClick }: { images: string[], onImageClic
         onClick={() => onImageClick(images[0]!)}
         className="relative w-full aspect-square rounded-[3rem] overflow-hidden border-8 border-white shadow-[0_20px_50px_rgba(251,191,36,0.2)] cursor-zoom-in hover:scale-105 hover:rotate-2 transition-all duration-500 group"
       >
-        <img src={images[0]} alt="Milestone" className="w-full h-full object-cover saturate-150 group-hover:scale-110 transition-transform duration-700" />
+        <Image src={images[0] || ""} alt="Milestone" className="w-full h-full object-cover saturate-150 group-hover:scale-110 transition-transform duration-700" width={1200} height={1200} unoptimized={typeof images[0] === "string" && (images[0].startsWith("blob:") || images[0].startsWith("data:"))} />
       </div>
     )
   }
@@ -240,13 +241,13 @@ function SummerGallery({ images, onImageClick }: { images: string[], onImageClic
           onClick={() => onImageClick(images[0]!)}
           className="absolute top-0 left-0 w-2/3 h-2/3 rounded-full overflow-hidden border-8 border-white shadow-2xl cursor-zoom-in hover:scale-110 hover:z-30 transition-all duration-500 z-10 group"
         >
-          <img src={images[0]} alt="Milestone 1" className="w-full h-full object-cover saturate-150 group-hover:scale-110 transition-transform duration-700" />
+          <Image src={images[0] || ""} alt="Milestone 1" className="w-full h-full object-cover saturate-150 group-hover:scale-110 transition-transform duration-700" width={1200} height={1200} unoptimized={typeof images[0] === "string" && (images[0].startsWith("blob:") || images[0].startsWith("data:"))} />
         </div>
         <div 
           onClick={() => onImageClick(images[1]!)}
           className="absolute bottom-0 right-0 w-2/3 h-2/3 rounded-full overflow-hidden border-8 border-white shadow-2xl cursor-zoom-in hover:scale-110 hover:z-30 transition-all duration-500 z-20 group"
         >
-          <img src={images[1]} alt="Milestone 2" className="w-full h-full object-cover saturate-150 group-hover:scale-110 transition-transform duration-700" />
+          <Image src={images[1] || ""} alt="Milestone 2" className="w-full h-full object-cover saturate-150 group-hover:scale-110 transition-transform duration-700" width={1200} height={1200} unoptimized={typeof images[1] === "string" && (images[1].startsWith("blob:") || images[1].startsWith("data:"))} />
         </div>
       </div>
     )
@@ -258,19 +259,19 @@ function SummerGallery({ images, onImageClick }: { images: string[], onImageClic
         onClick={() => onImageClick(images[0]!)}
         className="absolute top-0 left-0 w-[60%] h-[60%] rounded-[2rem] overflow-hidden border-8 border-white shadow-xl cursor-zoom-in hover:scale-110 hover:z-30 transition-all duration-500 z-10 group rotate-[-5deg]"
       >
-        <img src={images[0]} alt="Milestone 1" className="w-full h-full object-cover saturate-150 group-hover:scale-110 transition-transform duration-700" />
+        <Image src={images[0] || ""} alt="Milestone 1" className="w-full h-full object-cover saturate-150 group-hover:scale-110 transition-transform duration-700" width={1200} height={1200} unoptimized={typeof images[0] === "string" && (images[0].startsWith("blob:") || images[0].startsWith("data:"))} />
       </div>
       <div 
         onClick={() => onImageClick(images[1]!)}
         className="absolute top-10 right-0 w-[50%] h-[50%] rounded-[2rem] overflow-hidden border-8 border-white shadow-xl cursor-zoom-in hover:scale-110 hover:z-30 transition-all duration-500 z-20 group rotate-[5deg]"
       >
-        <img src={images[1]} alt="Milestone 2" className="w-full h-full object-cover saturate-150 group-hover:scale-110 transition-transform duration-700" />
+        <Image src={images[1] || ""} alt="Milestone 2" className="w-full h-full object-cover saturate-150 group-hover:scale-110 transition-transform duration-700" width={1200} height={1200} unoptimized={typeof images[1] === "string" && (images[1].startsWith("blob:") || images[1].startsWith("data:"))} />
       </div>
       <div 
         onClick={() => onImageClick(images[2]!)}
         className="absolute bottom-0 right-10 w-[65%] h-[50%] rounded-[2rem] overflow-hidden border-8 border-white shadow-xl cursor-zoom-in hover:scale-110 hover:z-30 transition-all duration-500 z-30 group rotate-[-2deg]"
       >
-        <img src={images[2]} alt="Milestone 3" className="w-full h-full object-cover saturate-150 group-hover:scale-110 transition-transform duration-700" />
+        <Image src={images[2] || ""} alt="Milestone 3" className="w-full h-full object-cover saturate-150 group-hover:scale-110 transition-transform duration-700" width={1200} height={1200} unoptimized={typeof images[2] === "string" && (images[2].startsWith("blob:") || images[2].startsWith("data:"))} />
       </div>
     </div>
   )
