@@ -3,7 +3,10 @@
 import Image from 'next/image'
 import { MapPin, ArrowLeft, Camera, Navigation, X, Trash2, Heart } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
+import { ImageLightbox } from '../../shared/ImageLightbox'
+import { Play } from 'lucide-react'
 
 interface ThemeProps {
   trip: any;
@@ -29,39 +32,13 @@ export function ScrapbookTheme({ trip, isOwner, hasLiked, likesCount, handleTogg
   return (
     <div className="min-h-screen bg-[#fdfcf8] py-16 font-serif relative overflow-hidden">
       
-      {/* 1. Cinematic Lightbox Overlay */}
-      <AnimatePresence>
-        {selectedImage && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedImage(null)}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-xl p-4 md:p-12 cursor-zoom-out"
-          >
-            <motion.div 
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="relative max-w-7xl max-h-screen w-full h-full flex items-center justify-center"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button 
-                onClick={() => setSelectedImage(null)}
-                className="absolute top-4 right-4 md:-top-4 md:-right-4 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full backdrop-blur-md transition-colors"
-              >
-                <X className="w-6 h-6" />
-              </button>
-              <Image 
-                src={selectedImage} 
-                alt="Enlarged" 
-                className="max-w-full max-h-[85vh] object-contain rounded-sm shadow-2xl" 
-              width={1200} height={1200} unoptimized={typeof selectedImage === 'string' && (selectedImage.startsWith('blob:') || selectedImage.startsWith('data:'))} />
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* 1. Cinematic Lightbox Overlay for Cover Image */}
+      <ImageLightbox 
+        images={selectedImage ? [selectedImage] : []}
+        initialIndex={0}
+        isOpen={!!selectedImage}
+        onClose={() => setSelectedImage(null)}
+      />
 
       {/* Checkered Background */}
       <div className="absolute inset-0 pointer-events-none opacity-40 bg-[linear-gradient(to_right,#c9644215_1px,transparent_1px),linear-gradient(to_bottom,#c9644215_1px,transparent_1px)] bg-[size:32px_32px]" />
@@ -122,9 +99,10 @@ export function ScrapbookTheme({ trip, isOwner, hasLiked, likesCount, handleTogg
             >
               <motion.img 
                 layoutId={`trip-cover-${trip.id}`}
-                src={coverImage} 
+                src={coverImage.split('|')[0]} 
                 alt={trip.title} 
-                className="w-full h-full object-cover"
+                onClick={() => setSelectedImage(coverImage)}
+                className="w-full h-full object-cover cursor-zoom-in"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
             </motion.div>
@@ -205,14 +183,14 @@ export function ScrapbookTheme({ trip, isOwner, hasLiked, likesCount, handleTogg
                       </div>
                     </div>
                   ) : (
-                    <ScrapbookCollage images={milestone.images} onImageClick={setSelectedImage} />
+                    <ScrapbookCollage images={milestone.images} />
                   )}
                 </div>
 
                 {/* Right Side */}
                 <div className={`w-full lg:w-[45%] flex ${isEven ? 'lg:justify-start lg:order-2 order-2 mt-8 lg:mt-0' : 'lg:justify-start lg:order-2 order-1'} px-4 lg:px-12`}>
                   {isEven ? (
-                    <ScrapbookCollage images={milestone.images} onImageClick={setSelectedImage} />
+                    <ScrapbookCollage images={milestone.images} />
                   ) : (
                     <div className="bg-white/80 backdrop-blur-sm p-8 md:p-12 rounded-3xl shadow-xl border border-slate-100 max-w-xl text-left w-full hover:shadow-2xl transition-shadow duration-300">
                       <h3 className="font-serif text-3xl md:text-4xl text-slate-900 mb-8 flex items-center gap-3">
@@ -242,57 +220,110 @@ export function ScrapbookTheme({ trip, isOwner, hasLiked, likesCount, handleTogg
   )
 }
 
-function ScrapbookCollage({ images, onImageClick }: { images: string[], onImageClick: (img: string) => void }) {
+function ScrapbookCollage({ images }: { images: string[] }) {
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
   if (!images || images.length === 0) return null;
 
-  if (images.length === 1) {
-    return (
-      <div 
-        onClick={() => onImageClick(images[0]!)}
-        className={`relative bg-white p-4 pb-16 shadow-2xl border border-slate-200 rotate-1 hover:rotate-0 hover:scale-105 transition-all duration-500 w-full max-w-xl mx-auto cursor-zoom-in`}
-      >
-        <Image src={images[0] || ""} alt="Milestone" className="w-full aspect-[4/3] object-cover bg-slate-100" width={1200} height={1200} unoptimized={typeof images[0] === "string" && (images[0].startsWith("blob:") || images[0].startsWith("data:"))} />
-        <div className="absolute bottom-5 left-0 right-0 text-center font-sans text-slate-400 opacity-60 italic text-sm">Moment captured</div>
-      </div>
-    )
-  }
+  const handleOpen = (index: number) => {
+    setLightboxIndex(index);
+    setLightboxOpen(true);
+  };
 
-  if (images.length === 2) {
+  const renderMedia = (rawUrl: string) => {
+    const isVideo = rawUrl.split('|')[0]?.split('?')[0]?.toLowerCase().match(/\.(mp4|mov|webm)$/);
+    const mediaUrl = rawUrl.split('|')[0] || '';
+    const thumbnailUrl = rawUrl.split('|')[1];
+
     return (
-      <div className="relative w-full max-w-xl mx-auto h-[400px] md:h-[500px]">
+      <>
+        {isVideo ? (
+          thumbnailUrl ? (
+            <Image src={thumbnailUrl} alt="Milestone Video" className="w-full h-full object-cover bg-slate-100" width={1200} height={1200} unoptimized={thumbnailUrl.startsWith('blob:') || thumbnailUrl.startsWith('data:')} />
+          ) : (
+            <div className="w-full h-full bg-slate-900 flex items-center justify-center">
+              <Play className="w-12 h-12 text-white/30" />
+            </div>
+          )
+        ) : (
+          <Image src={mediaUrl} alt="Milestone" className="w-full h-full object-cover bg-slate-100" width={1200} height={1200} unoptimized={mediaUrl.startsWith('blob:') || mediaUrl.startsWith('data:')} />
+        )}
+        {isVideo && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 flex items-center justify-center">
+              <Play className="w-5 h-5 text-white ml-1 fill-current opacity-90" />
+            </div>
+          </div>
+        )}
+      </>
+    );
+  };
+
+  const renderContent = () => {
+    if (images.length === 1) {
+      return (
         <div 
-          onClick={() => onImageClick(images[0]!)}
-          className="absolute top-0 left-0 w-3/4 bg-white p-3 pb-12 shadow-xl border border-slate-200 -rotate-3 hover:rotate-0 hover:scale-105 hover:z-30 transition-all duration-500 z-10 cursor-zoom-in"
+          onClick={() => handleOpen(0)}
+          className={`relative bg-white p-4 pb-16 shadow-2xl border border-slate-200 rotate-1 hover:rotate-0 hover:scale-105 transition-all duration-500 w-full max-w-xl mx-auto cursor-zoom-in group`}
         >
-          <Image src={images[0] || ""} alt="Milestone 1" className="w-full aspect-square object-cover" width={1200} height={1200} unoptimized={typeof images[0] === "string" && (images[0].startsWith("blob:") || images[0].startsWith("data:"))} />
+          <div className="w-full aspect-[4/3] relative">
+            {renderMedia(images[0]!)}
+          </div>
+          <div className="absolute bottom-5 left-0 right-0 text-center font-sans text-slate-400 opacity-60 italic text-sm">Moment captured</div>
         </div>
-        <div 
-          onClick={() => onImageClick(images[1]!)}
-          className="absolute bottom-0 right-0 w-3/4 bg-white p-3 pb-12 shadow-2xl border border-slate-200 rotate-6 hover:rotate-0 hover:scale-105 hover:z-30 transition-all duration-500 z-20 cursor-zoom-in"
-        >
-          <Image src={images[1] || ""} alt="Milestone 2" className="w-full aspect-square object-cover" width={1200} height={1200} unoptimized={typeof images[1] === "string" && (images[1].startsWith("blob:") || images[1].startsWith("data:"))} />
+      )
+    }
+
+    if (images.length === 2) {
+      return (
+        <div className="relative w-full max-w-xl mx-auto h-[400px] md:h-[500px]">
+          <div 
+            onClick={() => handleOpen(0)}
+            className="absolute top-0 left-0 w-3/4 bg-white p-3 pb-12 shadow-xl border border-slate-200 -rotate-3 hover:rotate-0 hover:scale-105 hover:z-30 transition-all duration-500 z-10 cursor-zoom-in group"
+          >
+            <div className="w-full aspect-square relative">{renderMedia(images[0]!)}</div>
+          </div>
+          <div 
+            onClick={() => handleOpen(1)}
+            className="absolute bottom-0 right-0 w-3/4 bg-white p-3 pb-12 shadow-2xl border border-slate-200 rotate-6 hover:rotate-0 hover:scale-105 hover:z-30 transition-all duration-500 z-20 cursor-zoom-in group"
+          >
+            <div className="w-full aspect-square relative">{renderMedia(images[1]!)}</div>
+          </div>
         </div>
+      )
+    }
+
+    return (
+      <div className="relative w-full max-w-xl mx-auto h-[500px] md:h-[600px] flex items-center justify-center">
+        {images.slice(0, 4).map((img, idx) => {
+          const rotations = ['-rotate-6', 'rotate-3', '-rotate-2', 'rotate-12'];
+          const positions = ['top-0 left-0', 'top-10 right-0', 'bottom-10 left-10', 'bottom-0 right-10'];
+          
+          return (
+            <div 
+              key={idx}
+              onClick={() => handleOpen(idx)}
+              className={`absolute ${positions[idx % 4]} w-2/3 bg-white p-3 pb-12 shadow-xl border border-slate-200 ${rotations[idx % 4]} hover:rotate-0 hover:z-50 hover:scale-110 transition-all duration-500 cursor-zoom-in group`}
+              style={{ zIndex: idx }}
+            >
+              <div className="w-full aspect-square relative">{renderMedia(img)}</div>
+            </div>
+          )
+        })}
       </div>
     )
   }
 
   return (
-    <div className="relative w-full max-w-xl mx-auto h-[500px] md:h-[600px] flex items-center justify-center">
-      {images.slice(0, 4).map((img, idx) => {
-        const rotations = ['-rotate-6', 'rotate-3', '-rotate-2', 'rotate-12'];
-        const positions = ['top-0 left-0', 'top-10 right-0', 'bottom-10 left-10', 'bottom-0 right-10'];
-        
-        return (
-          <div 
-            key={idx}
-            onClick={() => onImageClick(img!)}
-            className={`absolute ${positions[idx % 4]} w-2/3 bg-white p-3 pb-12 shadow-xl border border-slate-200 ${rotations[idx % 4]} hover:rotate-0 hover:z-50 hover:scale-110 transition-all duration-500 cursor-zoom-in`}
-            style={{ zIndex: idx }}
-          >
-            <Image src={img} alt={`Milestone ${idx+1}`} className="w-full aspect-square object-cover" width={1200} height={1200} unoptimized={typeof img === 'string' && (img.startsWith('blob:') || img.startsWith('data:'))} />
-          </div>
-        )
-      })}
-    </div>
-  )
+    <>
+      {renderContent()}
+      <ImageLightbox 
+        images={images}
+        initialIndex={lightboxIndex}
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+      />
+    </>
+  );
 }

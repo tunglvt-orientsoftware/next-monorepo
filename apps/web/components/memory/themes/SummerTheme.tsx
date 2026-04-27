@@ -3,7 +3,10 @@
 import Image from 'next/image'
 import { MapPin, ArrowLeft, Camera, Navigation, X, Trash2, Heart, Sun } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { ImageLightbox } from '../../shared/ImageLightbox'
+import { Play } from 'lucide-react'
 
 interface ThemeProps {
   trip: any;
@@ -24,39 +27,13 @@ export function SummerTheme({ trip, isOwner, hasLiked, likesCount, handleToggleL
   return (
     <div className="min-h-screen bg-[#fffdf0] py-16 font-sans relative overflow-hidden">
       
-      {/* Lightbox Overlay */}
-      <AnimatePresence>
-        {selectedImage && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedImage(null)}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-[#ffeaa7]/95 backdrop-blur-md p-4 md:p-12 cursor-zoom-out"
-          >
-            <motion.div 
-              initial={{ scale: 0.8, y: 50, rotate: -5 }}
-              animate={{ scale: 1, y: 0, rotate: 0 }}
-              exit={{ scale: 0.8, y: 50, rotate: 5 }}
-              transition={{ type: "spring", damping: 15, stiffness: 200 }}
-              className="relative max-w-7xl max-h-screen w-full h-full flex items-center justify-center"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button 
-                onClick={() => setSelectedImage(null)}
-                className="absolute top-4 right-4 md:-top-4 md:-right-4 bg-orange-400 hover:bg-orange-500 text-white p-3 rounded-full transition-colors shadow-lg z-50"
-              >
-                <X className="w-6 h-6" />
-              </button>
-              <Image 
-                src={selectedImage} 
-                alt="Enlarged" 
-                className="max-w-full max-h-[85vh] object-contain rounded-[2rem] shadow-[0_20px_50px_rgba(251,191,36,0.3)] border-4 border-white" 
-              width={1200} height={1200} unoptimized={typeof selectedImage === 'string' && (selectedImage.startsWith('blob:') || selectedImage.startsWith('data:'))} />
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Lightbox Overlay for Cover Image */}
+      <ImageLightbox 
+        images={selectedImage ? [selectedImage] : []}
+        initialIndex={0}
+        isOpen={!!selectedImage}
+        onClose={() => setSelectedImage(null)}
+      />
 
       {/* Summer Background Blobs */}
       <div className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-yellow-300/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob pointer-events-none" />
@@ -126,9 +103,10 @@ export function SummerTheme({ trip, isOwner, hasLiked, likesCount, handleToggleL
               className="w-full max-w-4xl mx-auto h-[50vh] md:h-[60vh] mb-12 rounded-[3rem] overflow-hidden shadow-2xl relative border-8 border-white transform hover:scale-[1.02] transition-transform duration-500"
             >
               <Image 
-                src={coverImage} 
+                src={coverImage.split('|')[0]} 
                 alt={trip.title} 
-                className="w-full h-full object-cover saturate-150"
+                onClick={() => setSelectedImage(coverImage)}
+                className="w-full h-full object-cover saturate-150 cursor-zoom-in"
               width={1200} height={1200} unoptimized={typeof coverImage === 'string' && (coverImage.startsWith('blob:') || coverImage.startsWith('data:'))} />
             </motion.div>
           )}
@@ -203,7 +181,7 @@ export function SummerTheme({ trip, isOwner, hasLiked, likesCount, handleToggleL
                 {/* Image Side */}
                 <div className={`${isEven ? 'lg:order-2' : 'lg:order-1'} relative z-10`}>
                   {hasImages ? (
-                    <SummerGallery images={milestone.images} onImageClick={setSelectedImage} />
+                    <SummerGallery images={milestone.images} />
                   ) : (
                     <div className="w-full aspect-square rounded-[3rem] bg-gradient-to-br from-orange-100 to-pink-100 flex items-center justify-center border-4 border-white shadow-xl">
                       <Camera className="w-20 h-20 text-orange-300" />
@@ -220,59 +198,110 @@ export function SummerTheme({ trip, isOwner, hasLiked, likesCount, handleToggleL
   )
 }
 
-function SummerGallery({ images, onImageClick }: { images: string[], onImageClick: (img: string) => void }) {
+function SummerGallery({ images }: { images: string[] }) {
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
   if (!images || images.length === 0) return null;
 
-  if (images.length === 1) {
-    return (
-      <div 
-        onClick={() => onImageClick(images[0]!)}
-        className="relative w-full aspect-square rounded-[3rem] overflow-hidden border-8 border-white shadow-[0_20px_50px_rgba(251,191,36,0.2)] cursor-zoom-in hover:scale-105 hover:rotate-2 transition-all duration-500 group"
-      >
-        <Image src={images[0] || ""} alt="Milestone" className="w-full h-full object-cover saturate-150 group-hover:scale-110 transition-transform duration-700" width={1200} height={1200} unoptimized={typeof images[0] === "string" && (images[0].startsWith("blob:") || images[0].startsWith("data:"))} />
-      </div>
-    )
-  }
+  const handleOpen = (index: number) => {
+    setLightboxIndex(index);
+    setLightboxOpen(true);
+  };
 
-  if (images.length === 2) {
+  const renderMedia = (rawUrl: string) => {
+    const isVideo = rawUrl.split('|')[0]?.split('?')[0]?.toLowerCase().match(/\.(mp4|mov|webm)$/);
+    const mediaUrl = rawUrl.split('|')[0] || '';
+    const thumbnailUrl = rawUrl.split('|')[1];
+
+    return (
+      <>
+        {isVideo ? (
+          thumbnailUrl ? (
+            <Image src={thumbnailUrl} alt="Milestone Video" className="w-full h-full object-cover saturate-150 group-hover:scale-110 transition-transform duration-700" width={1200} height={1200} unoptimized={thumbnailUrl.startsWith('blob:') || thumbnailUrl.startsWith('data:')} />
+          ) : (
+            <div className="w-full h-full bg-slate-900 flex items-center justify-center">
+              <Play className="w-12 h-12 text-white/30" />
+            </div>
+          )
+        ) : (
+          <Image src={mediaUrl} alt="Milestone" className="w-full h-full object-cover saturate-150 group-hover:scale-110 transition-transform duration-700" width={1200} height={1200} unoptimized={mediaUrl.startsWith('blob:') || mediaUrl.startsWith('data:')} />
+        )}
+        {isVideo && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 flex items-center justify-center">
+              <Play className="w-5 h-5 text-white ml-1 fill-current opacity-90" />
+            </div>
+          </div>
+        )}
+      </>
+    );
+  };
+
+  const renderContent = () => {
+    if (images.length === 1) {
+      return (
+        <div 
+          onClick={() => handleOpen(0)}
+          className="relative w-full aspect-square rounded-[3rem] overflow-hidden border-8 border-white shadow-[0_20px_50px_rgba(251,191,36,0.2)] cursor-zoom-in hover:scale-105 hover:rotate-2 transition-all duration-500 group"
+        >
+          {renderMedia(images[0]!)}
+        </div>
+      )
+    }
+
+    if (images.length === 2) {
+      return (
+        <div className="relative w-full aspect-square">
+          <div 
+            onClick={() => handleOpen(0)}
+            className="absolute top-0 left-0 w-2/3 h-2/3 rounded-full overflow-hidden border-8 border-white shadow-2xl cursor-zoom-in hover:scale-110 hover:z-30 transition-all duration-500 z-10 group"
+          >
+            {renderMedia(images[0]!)}
+          </div>
+          <div 
+            onClick={() => handleOpen(1)}
+            className="absolute bottom-0 right-0 w-2/3 h-2/3 rounded-full overflow-hidden border-8 border-white shadow-2xl cursor-zoom-in hover:scale-110 hover:z-30 transition-all duration-500 z-20 group"
+          >
+            {renderMedia(images[1]!)}
+          </div>
+        </div>
+      )
+    }
+
     return (
       <div className="relative w-full aspect-square">
         <div 
-          onClick={() => onImageClick(images[0]!)}
-          className="absolute top-0 left-0 w-2/3 h-2/3 rounded-full overflow-hidden border-8 border-white shadow-2xl cursor-zoom-in hover:scale-110 hover:z-30 transition-all duration-500 z-10 group"
+          onClick={() => handleOpen(0)}
+          className="absolute top-0 left-0 w-[60%] h-[60%] rounded-[2rem] overflow-hidden border-8 border-white shadow-xl cursor-zoom-in hover:scale-110 hover:z-30 transition-all duration-500 z-10 group rotate-[-5deg]"
         >
-          <Image src={images[0] || ""} alt="Milestone 1" className="w-full h-full object-cover saturate-150 group-hover:scale-110 transition-transform duration-700" width={1200} height={1200} unoptimized={typeof images[0] === "string" && (images[0].startsWith("blob:") || images[0].startsWith("data:"))} />
+          {renderMedia(images[0]!)}
         </div>
         <div 
-          onClick={() => onImageClick(images[1]!)}
-          className="absolute bottom-0 right-0 w-2/3 h-2/3 rounded-full overflow-hidden border-8 border-white shadow-2xl cursor-zoom-in hover:scale-110 hover:z-30 transition-all duration-500 z-20 group"
+          onClick={() => handleOpen(1)}
+          className="absolute top-10 right-0 w-[50%] h-[50%] rounded-[2rem] overflow-hidden border-8 border-white shadow-xl cursor-zoom-in hover:scale-110 hover:z-30 transition-all duration-500 z-20 group rotate-[5deg]"
         >
-          <Image src={images[1] || ""} alt="Milestone 2" className="w-full h-full object-cover saturate-150 group-hover:scale-110 transition-transform duration-700" width={1200} height={1200} unoptimized={typeof images[1] === "string" && (images[1].startsWith("blob:") || images[1].startsWith("data:"))} />
+          {renderMedia(images[1]!)}
+        </div>
+        <div 
+          onClick={() => handleOpen(2)}
+          className="absolute bottom-0 right-10 w-[65%] h-[50%] rounded-[2rem] overflow-hidden border-8 border-white shadow-xl cursor-zoom-in hover:scale-110 hover:z-30 transition-all duration-500 z-30 group rotate-[-2deg]"
+        >
+          {renderMedia(images[2]!)}
         </div>
       </div>
     )
   }
 
   return (
-    <div className="relative w-full aspect-square">
-      <div 
-        onClick={() => onImageClick(images[0]!)}
-        className="absolute top-0 left-0 w-[60%] h-[60%] rounded-[2rem] overflow-hidden border-8 border-white shadow-xl cursor-zoom-in hover:scale-110 hover:z-30 transition-all duration-500 z-10 group rotate-[-5deg]"
-      >
-        <Image src={images[0] || ""} alt="Milestone 1" className="w-full h-full object-cover saturate-150 group-hover:scale-110 transition-transform duration-700" width={1200} height={1200} unoptimized={typeof images[0] === "string" && (images[0].startsWith("blob:") || images[0].startsWith("data:"))} />
-      </div>
-      <div 
-        onClick={() => onImageClick(images[1]!)}
-        className="absolute top-10 right-0 w-[50%] h-[50%] rounded-[2rem] overflow-hidden border-8 border-white shadow-xl cursor-zoom-in hover:scale-110 hover:z-30 transition-all duration-500 z-20 group rotate-[5deg]"
-      >
-        <Image src={images[1] || ""} alt="Milestone 2" className="w-full h-full object-cover saturate-150 group-hover:scale-110 transition-transform duration-700" width={1200} height={1200} unoptimized={typeof images[1] === "string" && (images[1].startsWith("blob:") || images[1].startsWith("data:"))} />
-      </div>
-      <div 
-        onClick={() => onImageClick(images[2]!)}
-        className="absolute bottom-0 right-10 w-[65%] h-[50%] rounded-[2rem] overflow-hidden border-8 border-white shadow-xl cursor-zoom-in hover:scale-110 hover:z-30 transition-all duration-500 z-30 group rotate-[-2deg]"
-      >
-        <Image src={images[2] || ""} alt="Milestone 3" className="w-full h-full object-cover saturate-150 group-hover:scale-110 transition-transform duration-700" width={1200} height={1200} unoptimized={typeof images[2] === "string" && (images[2].startsWith("blob:") || images[2].startsWith("data:"))} />
-      </div>
-    </div>
+    <>
+      {renderContent()}
+      <ImageLightbox 
+        images={images}
+        initialIndex={lightboxIndex}
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+      />
+    </>
   )
 }

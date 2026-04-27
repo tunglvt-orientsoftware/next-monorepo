@@ -4,6 +4,8 @@ import Image from 'next/image'
 import { MapPin, ArrowLeft, Camera, X, Trash2, Heart, Film } from 'lucide-react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
+import { ImageLightbox } from '../../shared/ImageLightbox'
+import { MediaGalleryGrid } from '../../shared/MediaGalleryGrid'
 
 interface ThemeProps {
   trip: any;
@@ -24,39 +26,13 @@ export function CinematicTheme({ trip, isOwner, hasLiked, likesCount, handleTogg
   return (
     <div className="min-h-screen bg-[#0a0a0c] text-slate-300 py-16 font-sans relative overflow-x-hidden selection:bg-indigo-500/30 selection:text-indigo-200">
       
-      {/* Lightbox Overlay */}
-      <AnimatePresence>
-        {selectedImage && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedImage(null)}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/98 backdrop-blur-xl p-4 md:p-12 cursor-zoom-out"
-          >
-            <motion.div 
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="relative max-w-screen-2xl max-h-screen w-full h-full flex items-center justify-center"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button 
-                onClick={() => setSelectedImage(null)}
-                className="absolute top-4 right-4 md:-top-4 md:-right-4 bg-white/10 hover:bg-white/20 text-white p-3 transition-colors z-50 rounded-full backdrop-blur-md"
-              >
-                <X className="w-6 h-6" />
-              </button>
-              <Image 
-                src={selectedImage} 
-                alt="Enlarged" 
-                className="max-w-full max-h-[90vh] object-contain shadow-[0_0_100px_rgba(255,255,255,0.05)]" 
-              width={1200} height={1200} unoptimized={typeof selectedImage === 'string' && (selectedImage.startsWith('blob:') || selectedImage.startsWith('data:'))} />
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Lightbox Overlay for Cover Image */}
+      <ImageLightbox 
+        images={selectedImage ? [selectedImage] : []}
+        initialIndex={0}
+        isOpen={!!selectedImage}
+        onClose={() => setSelectedImage(null)}
+      />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
         
@@ -145,9 +121,10 @@ export function CinematicTheme({ trip, isOwner, hasLiked, likesCount, handleTogg
                 <div className="absolute bottom-0 left-0 w-full h-[5%] bg-black z-20"></div>
                 
                 <Image 
-                  src={coverImage} 
+                  src={coverImage.split('|')[0]} 
                   alt={trip.title} 
-                  className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-1000 scale-105 group-hover:scale-100"
+                  onClick={() => setSelectedImage(coverImage)}
+                  className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-1000 scale-105 group-hover:scale-100 cursor-zoom-in"
                 width={1200} height={1200} unoptimized={typeof coverImage === 'string' && (coverImage.startsWith('blob:') || coverImage.startsWith('data:'))} />
                 
                 {/* Vignette */}
@@ -190,7 +167,9 @@ export function CinematicTheme({ trip, isOwner, hasLiked, likesCount, handleTogg
                 </div>
 
                 {hasImages ? (
-                  <CinematicGallery images={milestone.images} onImageClick={setSelectedImage} />
+                  <div className="px-4 md:px-16 w-full max-w-7xl mx-auto">
+                    <MediaGalleryGrid mediaUrls={milestone.images} />
+                  </div>
                 ) : (
                   <div className="w-full aspect-[21/9] bg-[#111116] border border-white/5 flex flex-col items-center justify-center mb-12">
                     <Camera className="w-12 h-12 text-white/10 mb-4" />
@@ -219,62 +198,4 @@ export function CinematicTheme({ trip, isOwner, hasLiked, likesCount, handleTogg
   )
 }
 
-function CinematicGallery({ images, onImageClick }: { images: string[], onImageClick: (img: string) => void }) {
-  if (!images || images.length === 0) return null;
 
-  if (images.length === 1) {
-    return (
-      <div 
-        onClick={() => onImageClick(images[0]!)}
-        className="relative w-full aspect-[21/9] bg-black overflow-hidden cursor-zoom-in group"
-      >
-        <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-700 z-10" />
-        <Image src={images[0] || ""} alt="Scene" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 scale-105 group-hover:scale-100 transition-all duration-1000 ease-out" width={1200} height={1200} unoptimized={typeof images[0] === "string" && (images[0].startsWith("blob:") || images[0].startsWith("data:"))} />
-      </div>
-    )
-  }
-
-  if (images.length === 2) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {images.map((img, i) => (
-          <div 
-            key={i}
-            onClick={() => onImageClick(img)}
-            className="relative w-full aspect-[16/9] bg-black overflow-hidden cursor-zoom-in group"
-          >
-            <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-700 z-10" />
-            <Image src={img} alt={`Scene ${i}`} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 scale-105 group-hover:scale-100 transition-all duration-1000 ease-out" width={1200} height={1200} unoptimized={typeof img === 'string' && (img.startsWith('blob:') || img.startsWith('data:'))} />
-          </div>
-        ))}
-      </div>
-    )
-  }
-
-  return (
-    <div className="space-y-4">
-      {/* Featured Wide Image */}
-      <div 
-        onClick={() => onImageClick(images[0]!)}
-        className="relative w-full aspect-[21/9] bg-black overflow-hidden cursor-zoom-in group"
-      >
-        <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-700 z-10" />
-        <Image src={images[0] || ""} alt="Main Scene" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 scale-105 group-hover:scale-100 transition-all duration-1000 ease-out" width={1200} height={1200} unoptimized={typeof images[0] === "string" && (images[0].startsWith("blob:") || images[0].startsWith("data:"))} />
-      </div>
-      
-      {/* Split secondary images */}
-      <div className="grid grid-cols-2 gap-4">
-        {images.slice(1, 3).map((img, i) => (
-          <div 
-            key={i + 1}
-            onClick={() => onImageClick(img)}
-            className="relative w-full aspect-[16/9] bg-black overflow-hidden cursor-zoom-in group"
-          >
-            <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-700 z-10" />
-            <Image src={img} alt={`B-Roll ${i + 1}`} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 scale-105 group-hover:scale-100 transition-all duration-1000 ease-out" width={1200} height={1200} unoptimized={typeof img === 'string' && (img.startsWith('blob:') || img.startsWith('data:'))} />
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}

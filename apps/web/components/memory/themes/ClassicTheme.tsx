@@ -4,6 +4,8 @@ import Image from 'next/image'
 import { MapPin, ArrowLeft, Camera, X, Trash2, Heart } from 'lucide-react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
+import { ImageLightbox } from '../../shared/ImageLightbox'
+import { MediaGalleryGrid } from '../../shared/MediaGalleryGrid'
 
 interface ThemeProps {
   trip: any;
@@ -24,41 +26,13 @@ export function ClassicTheme({ trip, isOwner, hasLiked, likesCount, handleToggle
   return (
     <div className="min-h-screen bg-[#fdfdfc] py-16 font-serif relative">
       
-      {/* Lightbox Overlay */}
-      <AnimatePresence>
-        {selectedImage && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedImage(null)}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-white/95 backdrop-blur-sm p-4 md:p-12 cursor-zoom-out"
-          >
-            <motion.div 
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="relative max-w-7xl max-h-screen w-full h-full flex items-center justify-center"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button 
-                onClick={() => setSelectedImage(null)}
-                className="absolute top-4 right-4 md:-top-4 md:-right-4 bg-black text-white hover:bg-slate-800 p-3 transition-colors z-50 rounded-sm"
-              >
-                <X className="w-6 h-6" />
-              </button>
-              <div className="p-4 border-8 border-double border-slate-900 bg-white shadow-2xl max-h-[90vh]">
-                <Image 
-                  src={selectedImage} 
-                  alt="Enlarged" 
-                  className="max-w-full max-h-[80vh] object-contain grayscale-[30%] contrast-125" 
-                width={1200} height={1200} unoptimized={typeof selectedImage === 'string' && (selectedImage.startsWith('blob:') || selectedImage.startsWith('data:'))} />
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Lightbox Overlay for Cover Image */}
+      <ImageLightbox 
+        images={selectedImage ? [selectedImage] : []}
+        initialIndex={0}
+        isOpen={!!selectedImage}
+        onClose={() => setSelectedImage(null)}
+      />
 
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
         
@@ -127,9 +101,10 @@ export function ClassicTheme({ trip, isOwner, hasLiked, likesCount, handleToggle
               className="w-full max-w-4xl mx-auto mb-16 p-2 bg-white border-4 border-double border-slate-900 shadow-xl relative"
             >
               <Image 
-                src={coverImage} 
+                src={coverImage.split('|')[0]} 
                 alt={trip.title} 
-                className="w-full h-[60vh] object-cover grayscale-[20%] contrast-125"
+                onClick={() => setSelectedImage(coverImage)}
+                className="w-full h-[60vh] object-cover grayscale-[20%] contrast-125 cursor-zoom-in"
               width={1200} height={1200} unoptimized={typeof coverImage === 'string' && (coverImage.startsWith('blob:') || coverImage.startsWith('data:'))} />
               <div className="absolute -bottom-4 right-8 bg-white px-4 border-2 border-slate-900 text-xs font-bold uppercase tracking-widest">
                 Fig 1. Cover
@@ -189,7 +164,12 @@ export function ClassicTheme({ trip, isOwner, hasLiked, likesCount, handleToggle
                   {/* Image Column */}
                   <div className={`md:col-span-7 ${i % 2 === 1 ? 'md:order-1' : ''}`}>
                     {hasImages ? (
-                      <ClassicGallery images={milestone.images} onImageClick={setSelectedImage} index={i} />
+                      <div className="p-2 bg-white border-2 border-slate-900 shadow-md">
+                        <MediaGalleryGrid mediaUrls={milestone.images} className="grayscale-[20%] contrast-125" />
+                        <div className="mt-2 text-right text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                          Plate {i + 1}
+                        </div>
+                      </div>
                     ) : (
                       <div className="w-full aspect-[4/3] bg-slate-100 border-4 border-slate-900 flex flex-col items-center justify-center p-8 text-center">
                         <Camera className="w-12 h-12 text-slate-300 mb-4" />
@@ -208,64 +188,4 @@ export function ClassicTheme({ trip, isOwner, hasLiked, likesCount, handleToggle
   )
 }
 
-function ClassicGallery({ images, onImageClick, index }: { images: string[], onImageClick: (img: string) => void, index: number }) {
-  if (!images || images.length === 0) return null;
 
-  if (images.length === 1) {
-    return (
-      <div className="relative p-2 bg-white border-2 border-slate-900 shadow-md group">
-        <div 
-          onClick={() => onImageClick(images[0]!)}
-          className="relative w-full aspect-[4/3] overflow-hidden cursor-zoom-in"
-        >
-          <Image src={images[0] || ""} alt="Milestone" className="w-full h-full object-cover grayscale-[20%] contrast-125 group-hover:scale-105 transition-transform duration-700" width={1200} height={1200} unoptimized={typeof images[0] === "string" && (images[0].startsWith("blob:") || images[0].startsWith("data:"))} />
-        </div>
-        <div className="absolute -bottom-3 right-4 bg-white px-2 text-[10px] font-bold uppercase tracking-widest text-slate-500">
-          Plate {index + 1}.A
-        </div>
-      </div>
-    )
-  }
-
-  if (images.length === 2) {
-    return (
-      <div className="grid grid-cols-2 gap-4">
-        {images.map((img, i) => (
-          <div key={i} className="relative p-1.5 bg-white border border-slate-900 shadow-sm group">
-            <div 
-              onClick={() => onImageClick(img)}
-              className="relative w-full aspect-[3/4] overflow-hidden cursor-zoom-in"
-            >
-              <Image src={img} alt={`Milestone ${i}`} className="w-full h-full object-cover grayscale-[20%] contrast-125 group-hover:scale-105 transition-transform duration-700" width={1200} height={1200} unoptimized={typeof img === 'string' && (img.startsWith('blob:') || img.startsWith('data:'))} />
-            </div>
-          </div>
-        ))}
-      </div>
-    )
-  }
-
-  return (
-    <div className="grid grid-cols-12 gap-4">
-      {/* Large Featured Image */}
-      <div className="col-span-12 relative p-2 bg-white border-2 border-slate-900 shadow-sm group">
-        <div 
-          onClick={() => onImageClick(images[0]!)}
-          className="relative w-full aspect-[16/9] overflow-hidden cursor-zoom-in"
-        >
-          <Image src={images[0] || ""} alt="Milestone 1" className="w-full h-full object-cover grayscale-[20%] contrast-125 group-hover:scale-105 transition-transform duration-700" width={1200} height={1200} unoptimized={typeof images[0] === "string" && (images[0].startsWith("blob:") || images[0].startsWith("data:"))} />
-        </div>
-      </div>
-      {/* Smaller Images below */}
-      {images.slice(1, 3).map((img, i) => (
-        <div key={i + 1} className="col-span-6 relative p-1.5 bg-white border border-slate-900 shadow-sm group">
-          <div 
-            onClick={() => onImageClick(img)}
-            className="relative w-full aspect-square overflow-hidden cursor-zoom-in"
-          >
-            <Image src={img} alt={`Milestone ${i + 1}`} className="w-full h-full object-cover grayscale-[20%] contrast-125 group-hover:scale-105 transition-transform duration-700" width={1200} height={1200} unoptimized={typeof img === 'string' && (img.startsWith('blob:') || img.startsWith('data:'))} />
-          </div>
-        </div>
-      ))}
-    </div>
-  )
-}

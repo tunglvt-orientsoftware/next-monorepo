@@ -3,7 +3,10 @@
 import Image from 'next/image'
 import { MapPin, ArrowLeft, Camera, Navigation, X, Trash2, Heart } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { ImageLightbox } from '../../shared/ImageLightbox'
+import { Play } from 'lucide-react'
 
 interface ThemeProps {
   trip: any;
@@ -24,42 +27,13 @@ export function PolaroidTheme({ trip, isOwner, hasLiked, likesCount, handleToggl
   return (
     <div className="min-h-screen bg-[#e8e4db] py-16 font-sans relative overflow-hidden">
       
-      {/* Lightbox Overlay */}
-      <AnimatePresence>
-        {selectedImage && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedImage(null)}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4 md:p-12 cursor-zoom-out"
-          >
-            <motion.div 
-              initial={{ scale: 0.9, y: 20, rotate: -2 }}
-              animate={{ scale: 1, y: 0, rotate: 0 }}
-              exit={{ scale: 0.9, y: 20, rotate: 2 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="relative bg-white p-6 pb-20 shadow-2xl max-w-4xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button 
-                onClick={() => setSelectedImage(null)}
-                className="absolute top-2 right-2 text-slate-400 hover:text-slate-900 transition-colors"
-              >
-                <X className="w-6 h-6" />
-              </button>
-              <Image 
-                src={selectedImage} 
-                alt="Enlarged" 
-                className="max-w-full max-h-[75vh] object-contain sepia-[0.3]" 
-              width={1200} height={1200} unoptimized={typeof selectedImage === 'string' && (selectedImage.startsWith('blob:') || selectedImage.startsWith('data:'))} />
-              <div className="absolute bottom-6 left-0 right-0 text-center font-serif text-2xl text-slate-800 -rotate-1 opacity-80">
-                Memories...
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Lightbox Overlay for Cover Image */}
+      <ImageLightbox 
+        images={selectedImage ? [selectedImage] : []}
+        initialIndex={0}
+        isOpen={!!selectedImage}
+        onClose={() => setSelectedImage(null)}
+      />
 
       {/* Paper Texture Overlay */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')]" />
@@ -107,18 +81,20 @@ export function PolaroidTheme({ trip, isOwner, hasLiked, likesCount, handleToggl
               initial={{ opacity: 0, scale: 0.9, rotate: -3 }}
               animate={{ opacity: 1, scale: 1, rotate: 2 }}
               transition={{ type: "spring", damping: 20 }}
-              className="relative bg-white p-4 md:p-6 pb-20 md:pb-24 shadow-2xl mb-12 max-w-2xl w-full"
+              className="relative bg-white p-4 md:p-6 shadow-2xl mb-12 max-w-2xl w-full flex flex-col"
             >
               {/* Tape */}
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-32 h-8 bg-white/40 backdrop-blur-sm -rotate-2 border border-white/20 shadow-sm z-10" />
               
               <Image 
-                src={coverImage} 
+                src={coverImage.split('|')[0]} 
                 alt={trip.title} 
-                className="w-full aspect-[4/3] object-cover sepia-[0.3]"
+                onClick={() => setSelectedImage(coverImage)}
+                className="w-full aspect-[4/3] object-cover sepia-[0.3] cursor-zoom-in"
               width={1200} height={1200} unoptimized={typeof coverImage === 'string' && (coverImage.startsWith('blob:') || coverImage.startsWith('data:'))} />
-              <div className="absolute bottom-6 md:bottom-8 left-0 right-0 text-center px-6">
-                 <h1 className="text-4xl md:text-5xl font-serif text-slate-800 -rotate-2">
+              
+              <div className="mt-8 md:mt-12 mb-4 md:mb-6 text-center px-4 md:px-6 flex-grow flex flex-col justify-center">
+                 <h1 className="text-4xl md:text-5xl font-serif text-slate-800 -rotate-2 leading-tight">
                   {trip.title || 'Untitled Trip'}
                  </h1>
               </div>
@@ -148,7 +124,7 @@ export function PolaroidTheme({ trip, isOwner, hasLiked, likesCount, handleToggl
         </div>
 
         {/* Milestones / Polaroid Layout */}
-        <div className="space-y-32 pb-32">
+        <div className="space-y-16 pb-16">
           {trip.milestones.map((milestone: any, i: number) => {
             const isEven = i % 2 === 0;
             const hasImages = milestone.images && milestone.images.length > 0;
@@ -164,8 +140,8 @@ export function PolaroidTheme({ trip, isOwner, hasLiked, likesCount, handleToggl
               >
                 {/* Connection string (pseudo timeline) */}
                 {i < trip.milestones.length - 1 && (
-                  <svg className="absolute left-1/2 -bottom-32 w-24 h-32 -translate-x-1/2 z-0 hidden md:block" preserveAspectRatio="none">
-                    <path d="M12,0 Q24,16 12,32 T12,64 T12,96 T12,128" fill="none" stroke="#d8d3c5" strokeWidth="2" strokeDasharray="4 4" />
+                  <svg className="absolute left-1/2 -bottom-16 w-24 h-16 -translate-x-1/2 z-0 hidden md:block" preserveAspectRatio="none">
+                    <path d="M12,0 Q24,16 12,32 T12,64" fill="none" stroke="#d8d3c5" strokeWidth="2" strokeDasharray="4 4" />
                   </svg>
                 )}
 
@@ -191,7 +167,7 @@ export function PolaroidTheme({ trip, isOwner, hasLiked, likesCount, handleToggl
                   {/* Polaroids */}
                   <div className={`w-full md:w-1/2 ${isEven ? 'md:order-2' : 'md:order-1'}`}>
                     {hasImages ? (
-                      <PolaroidGallery images={milestone.images} onImageClick={setSelectedImage} />
+                      <PolaroidGallery images={milestone.images} />
                     ) : (
                       <div className="w-full aspect-square max-w-sm mx-auto bg-white p-4 pb-16 shadow-xl flex items-center justify-center rotate-3">
                         <div className="absolute -top-3 right-8 w-16 h-6 bg-white/50 backdrop-blur-sm rotate-12 border border-white/20 shadow-sm" />
@@ -210,32 +186,96 @@ export function PolaroidTheme({ trip, isOwner, hasLiked, likesCount, handleToggl
   )
 }
 
-function PolaroidGallery({ images, onImageClick }: { images: string[], onImageClick: (img: string) => void }) {
+function PolaroidGallery({ images }: { images: string[] }) {
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
   if (!images || images.length === 0) return null;
 
-  return (
-    <div className="relative w-full max-w-sm mx-auto h-[400px] md:h-[500px]">
-      {images.slice(0, 3).map((img, idx) => {
-        const rotations = ['rotate-3', '-rotate-6', 'rotate-12'];
-        const offsets = ['top-0 left-0', 'top-8 left-8', 'top-16 left-4'];
-        
-        return (
-          <div 
-            key={idx}
-            onClick={() => onImageClick(img!)}
-            className={`absolute ${offsets[idx]} w-4/5 bg-white p-4 pb-20 shadow-xl border border-slate-200 ${rotations[idx]} hover:rotate-0 hover:scale-105 transition-all duration-300 cursor-zoom-in hover:z-50`}
-            style={{ zIndex: idx }}
-          >
-            {/* Tape */}
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-20 h-6 bg-amber-100/50 backdrop-blur-sm -rotate-3 border border-amber-200/20 shadow-sm z-10" />
-            
-            <Image src={img} alt={`Milestone ${idx+1}`} className="w-full aspect-square object-cover sepia-[0.4]" width={1200} height={1200} unoptimized={typeof img === 'string' && (img.startsWith('blob:') || img.startsWith('data:'))} />
-            <div className="absolute bottom-6 left-0 right-0 text-center font-serif text-xl text-slate-700 opacity-80 -rotate-2">
-              Photo {idx + 1}
+  const handleOpen = (index: number) => {
+    setLightboxIndex(index);
+    setLightboxOpen(true);
+  };
+
+  const renderMedia = (rawUrl: string) => {
+    const isVideo = rawUrl.split('|')[0]?.split('?')[0]?.toLowerCase().match(/\.(mp4|mov|webm)$/);
+    const mediaUrl = rawUrl.split('|')[0] || '';
+    const thumbnailUrl = rawUrl.split('|')[1];
+
+    return (
+      <>
+        {isVideo ? (
+          thumbnailUrl ? (
+            <Image src={thumbnailUrl} alt="Milestone Video" className="w-full aspect-square object-cover sepia-[0.4]" width={1200} height={1200} unoptimized={thumbnailUrl.startsWith('blob:') || thumbnailUrl.startsWith('data:')} />
+          ) : (
+            <div className="w-full aspect-square bg-slate-900 flex items-center justify-center">
+              <Play className="w-12 h-12 text-white/30" />
+            </div>
+          )
+        ) : (
+          <Image src={mediaUrl} alt="Milestone" className="w-full aspect-square object-cover sepia-[0.4]" width={1200} height={1200} unoptimized={mediaUrl.startsWith('blob:') || mediaUrl.startsWith('data:')} />
+        )}
+        {isVideo && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 flex items-center justify-center">
+              <Play className="w-5 h-5 text-white ml-1 fill-current opacity-90" />
             </div>
           </div>
-        )
-      })}
-    </div>
+        )}
+      </>
+    );
+  };
+
+  return (
+    <>
+      <div className="relative w-full max-w-sm mx-auto h-[450px] md:h-[500px] group mt-8 md:mt-0">
+        {images.slice(0, 3).map((img, idx) => {
+          // Default stack positions
+          const defaultRotations = ['rotate-3', '-rotate-6', 'rotate-6'];
+          const defaultTranslate = [
+            'translate-x-0 translate-y-0', 
+            'translate-x-3 translate-y-4', 
+            'translate-x-6 translate-y-8'
+          ];
+          const zIndexes = [30, 20, 10];
+          
+          // Hover spread positions (fan out)
+          // idx 0 moves left, idx 1 stays center/up slightly, idx 2 moves right
+          const hoverRotations = ['group-hover:-rotate-12', 'group-hover:rotate-0', 'group-hover:rotate-12'];
+          const hoverTranslate = [
+            'group-hover:-translate-x-12 md:group-hover:-translate-x-28 group-hover:-translate-y-4', 
+            'group-hover:translate-x-0 group-hover:-translate-y-8', 
+            'group-hover:translate-x-12 md:group-hover:translate-x-28 group-hover:-translate-y-2'
+          ];
+          
+          return (
+            <div 
+              key={idx}
+              onClick={() => handleOpen(idx)}
+              className={`absolute top-0 left-0 right-0 mx-auto w-4/5 bg-white p-4 pb-20 shadow-[0_15px_40px_rgba(0,0,0,0.15)] border border-slate-200 
+                ${defaultRotations[idx]} ${defaultTranslate[idx]}
+                ${hoverRotations[idx]} ${hoverTranslate[idx]}
+                hover:!z-50 hover:!scale-105 hover:shadow-2xl
+                transition-all duration-700 ease-out cursor-zoom-in`}
+              style={{ zIndex: zIndexes[idx] }}
+            >
+              {/* Tape */}
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-20 h-6 bg-amber-100/50 backdrop-blur-sm -rotate-3 border border-amber-200/20 shadow-sm z-10" />
+              
+              <div className="w-full aspect-square relative">{renderMedia(img)}</div>
+              <div className="absolute bottom-6 left-0 right-0 text-center font-serif text-xl text-slate-700 opacity-80 -rotate-2">
+                Photo {idx + 1}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+      <ImageLightbox 
+        images={images}
+        initialIndex={lightboxIndex}
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+      />
+    </>
   )
 }
