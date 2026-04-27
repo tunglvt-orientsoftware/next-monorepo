@@ -82,7 +82,7 @@ export function SummerTheme({ trip, isOwner, hasLiked, likesCount, handleToggleL
             {isOwner && (
               <>
                 <Link 
-                  href={`/my-memories/${trip.id}/edit`}
+                  href={`/trip/${trip.id}/edit`}
                   className="inline-flex items-center text-orange-600 hover:text-white hover:bg-orange-500 font-bold transition-all bg-white px-4 py-2 sm:px-5 sm:py-3 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-orange-100 hover:scale-105 transform duration-200 whitespace-nowrap text-sm sm:text-base"
                 >
                   Edit

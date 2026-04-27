@@ -14,7 +14,7 @@ type DayInfo = {
 }
 
 function TimelineImage({ query, onImageClick }: { query?: string; onImageClick: (url: string, alt: string) => void }) {
-  const [imageUrl, setImageUrl] = useState<string | null>(null)
+  const [imageUrls, setImageUrls] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
@@ -23,11 +23,15 @@ function TimelineImage({ query, onImageClick }: { query?: string; onImageClick: 
     let isMounted = true
     setIsLoading(true)
 
-    fetch(`/api/images?q=${encodeURIComponent(query)}`)
+    fetch(`/api/images?q=${encodeURIComponent(query)}&count=3`)
       .then(res => res.json())
       .then(data => {
-        if (isMounted && data.url) {
-          setImageUrl(data.url)
+        if (isMounted) {
+          if (data.urls && data.urls.length > 0) {
+            setImageUrls(data.urls)
+          } else if (data.url) {
+            setImageUrls([data.url])
+          }
         }
       })
       .catch(console.error)
@@ -43,34 +47,43 @@ function TimelineImage({ query, onImageClick }: { query?: string; onImageClick: 
   if (!query) return null
 
   return (
-    <div className="w-full h-48 bg-slate-100 rounded-xl mb-4 overflow-hidden relative flex items-center justify-center group">
+    <div className="w-full mb-4">
       {isLoading ? (
-        <div className="animate-pulse flex items-center gap-2 text-slate-400">
-          <ImageIcon className="w-5 h-5" />
-          <span className="text-sm">Finding photo...</span>
-        </div>
-      ) : imageUrl ? (
-        <button
-          type="button"
-          onClick={() => onImageClick(imageUrl, query)}
-          className="w-full h-full block relative cursor-zoom-in"
-        >
-          <Image
-            src={imageUrl}
-            alt={query}
-            className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-700"
-            crossOrigin="anonymous"
-            width={1200} height={1200} unoptimized={typeof imageUrl === 'string' && (imageUrl.startsWith('blob:') || imageUrl.startsWith('data:'))} />
-          {/* Hover overlay */}
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 backdrop-blur-sm p-2.5 rounded-full shadow-lg">
-              <ZoomIn className="w-5 h-5 text-slate-700" />
-            </div>
+        <div className="w-full h-48 bg-slate-100 rounded-xl overflow-hidden relative flex items-center justify-center">
+          <div className="animate-pulse flex items-center gap-2 text-slate-400">
+            <ImageIcon className="w-5 h-5" />
+            <span className="text-sm">Finding photo...</span>
           </div>
-        </button>
+        </div>
+      ) : imageUrls.length > 0 ? (
+        <div className={`grid gap-2 ${imageUrls.length === 1 ? 'grid-cols-1' : imageUrls.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+          {imageUrls.map((url, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => onImageClick(url, query)}
+              className={`block relative cursor-zoom-in rounded-xl overflow-hidden group ${imageUrls.length === 1 ? 'w-full h-48' : imageUrls.length === 2 ? 'w-full h-40' : i === 0 ? 'col-span-2 row-span-2 h-64' : 'w-full h-[124px]'}`}
+            >
+              <Image
+                src={url}
+                alt={`${query} ${i + 1}`}
+                className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-700"
+                crossOrigin="anonymous"
+                width={800} height={800} unoptimized={typeof url === 'string' && (url.startsWith('blob:') || url.startsWith('data:'))} />
+              {/* Hover overlay */}
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 backdrop-blur-sm p-2.5 rounded-full shadow-lg">
+                  <ZoomIn className="w-5 h-5 text-slate-700" />
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
       ) : (
-        <div className="text-slate-400">
-          <ImageIcon className="w-8 h-8 opacity-50" />
+        <div className="w-full h-48 bg-slate-100 rounded-xl overflow-hidden relative flex items-center justify-center">
+          <div className="text-slate-400">
+            <ImageIcon className="w-8 h-8 opacity-50" />
+          </div>
         </div>
       )}
     </div>

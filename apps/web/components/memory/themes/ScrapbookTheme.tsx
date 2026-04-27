@@ -94,7 +94,7 @@ export function ScrapbookTheme({ trip, isOwner, hasLiked, likesCount, handleTogg
             {isOwner && (
               <>
                 <Link 
-                  href={`/my-memories/${trip.id}/edit`}
+                  href={`/trip/${trip.id}/edit`}
                   className="inline-flex items-center text-slate-600 hover:text-white hover:bg-slate-800 font-sans font-medium transition-colors bg-white/80 backdrop-blur-sm px-3 py-1.5 sm:px-4 sm:py-2 rounded-full shadow-sm border border-slate-200 cursor-pointer whitespace-nowrap text-sm sm:text-base"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-0 sm:mr-2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>

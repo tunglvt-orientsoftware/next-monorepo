@@ -8,6 +8,10 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Query is required' }, { status: 400 })
   }
 
+  const countParam = searchParams.get('count')
+  const count = countParam ? parseInt(countParam, 10) : 3
+  const num = Math.min(Math.max(count, 1), 10)
+
   try {
     const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY
     const GOOGLE_CX = process.env.GOOGLE_CX || 'd01840e848e32406a'
@@ -15,13 +19,14 @@ export async function GET(request: Request) {
     // If Google API Key is provided, use Google Custom Search API
     if (GOOGLE_API_KEY) {
       const response = await fetch(
-        `https://customsearch.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${GOOGLE_CX}&q=${encodeURIComponent(query)}&searchType=image&num=1`
+        `https://customsearch.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${GOOGLE_CX}&q=${encodeURIComponent(query)}&searchType=image&num=${num}`
       )
       
       const data = await response.json()
       
       if (data.items && data.items.length > 0) {
-        return NextResponse.json({ url: data.items[0].link })
+        const urls = data.items.map((item: any) => item.link)
+        return NextResponse.json({ urls, url: urls[0] })
       }
     }
 
@@ -29,25 +34,27 @@ export async function GET(request: Request) {
     const fallbackResponse = await fetch(
       `https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(
         query
-      )}&gsrlimit=1&prop=pageimages&format=json&pithumbsize=1000&origin=*`
+      )}&gsrlimit=${num}&prop=pageimages&format=json&pithumbsize=1000&origin=*`
     )
 
     const fallbackData = await fallbackResponse.json()
     const pages = fallbackData.query?.pages
 
     if (pages) {
-      const pageId = Object.keys(pages)[0]
-      if (pageId && pageId !== '-1') {
-        const imageUrl = pages[pageId].thumbnail?.source
-        if (imageUrl) {
-          return NextResponse.json({ url: imageUrl })
-        }
+      const urls = Object.values(pages)
+        .map((p: any) => p.thumbnail?.source)
+        .filter(Boolean) as string[]
+
+      if (urls.length > 0) {
+        return NextResponse.json({ urls, url: urls[0] })
       }
     }
 
     // Final fallback to pollinations.ai which generates a highly accurate photo of the location
+    const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(query + ' travel photography landscape beautiful high quality')}?width=1000&height=600&nologo=true`
     return NextResponse.json({ 
-      url: `https://image.pollinations.ai/prompt/${encodeURIComponent(query + ' travel photography landscape beautiful high quality')}?width=1000&height=600&nologo=true`
+      urls: [pollinationsUrl],
+      url: pollinationsUrl 
     })
 
   } catch (error) {

@@ -10,7 +10,7 @@ export function Footer() {
 
   // Hide on auth pages and specific full-screen flows like trip viewer/editor
   const isAuthPage = pathname === '/login' || pathname === '/signup'
-  const isTripPage = pathname?.startsWith('/my-memories/') && pathname !== '/my-memories/new'
+  const isTripPage = pathname?.startsWith('/trip/') || pathname === '/memory'
   
   if (isAuthPage || isTripPage) return null
 

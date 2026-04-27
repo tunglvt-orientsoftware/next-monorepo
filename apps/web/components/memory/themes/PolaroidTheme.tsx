@@ -83,7 +83,7 @@ export function PolaroidTheme({ trip, isOwner, hasLiked, likesCount, handleToggl
             {isOwner && (
               <>
                 <Link 
-                  href={`/my-memories/${trip.id}/edit`}
+                  href={`/trip/${trip.id}/edit`}
                   className="inline-flex items-center text-amber-900 hover:text-amber-700 font-serif text-sm sm:text-lg transition-colors bg-[#f4f1ea] px-3 py-1.5 sm:px-4 sm:py-2 shadow-md rotate-[-1deg] border border-[#d8d3c5] whitespace-nowrap"
                 >
                   Edit

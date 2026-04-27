@@ -80,7 +80,7 @@ export function ClassicTheme({ trip, isOwner, hasLiked, likesCount, handleToggle
             {isOwner && (
               <>
                 <Link 
-                  href={`/my-memories/${trip.id}/edit`}
+                  href={`/trip/${trip.id}/edit`}
                   className="inline-flex items-center text-slate-900 hover:text-white hover:bg-slate-900 font-bold uppercase tracking-widest text-xs sm:text-sm transition-colors px-3 py-1.5 sm:px-4 sm:py-2 border-2 border-slate-900 whitespace-nowrap"
                 >
                   Edit <span className="hidden sm:inline sm:ml-1">Record</span>

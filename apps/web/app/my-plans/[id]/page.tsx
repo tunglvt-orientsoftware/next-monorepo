@@ -15,6 +15,7 @@ export default function PlanDetailPage() {
   const router = useRouter()
   const [plan, setPlan] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isConverting, setIsConverting] = useState(false)
   const [checkedItems, setCheckedItems] = useState<Record<number, boolean>>({})
   const { setTripTitle, setTripStory, addMilestones, resetTrip } = useTripStore()
 
@@ -69,16 +70,34 @@ export default function PlanDetailPage() {
     }
   }
 
-  const handleConvertToTrip = () => {
+  const handleConvertToTrip = async () => {
     if (!plan?.itinerary) return
 
+    setIsConverting(true)
     resetTrip()
 
-    const milestones = plan.itinerary.map((day: any) => ({
-      id: crypto.randomUUID(),
-      title: `Day ${day.day || ''}: ${day.title || ''}`,
-      content: `${day.description || ''}\n\nActivities:\n${(day.activities || []).map((a: string) => `- ${a}`).join('\n')}`,
-      images: [],
+    const milestones = await Promise.all(plan.itinerary.map(async (day: any) => {
+      let images: string[] = []
+      if (day.imageSearchQuery) {
+        try {
+          const res = await fetch(`/api/images?q=${encodeURIComponent(day.imageSearchQuery)}&count=3`)
+          const data = await res.json()
+          if (data.urls && data.urls.length > 0) {
+            images = data.urls
+          } else if (data.url) {
+            images = [data.url]
+          }
+        } catch (e) {
+          console.error("Failed to fetch images for", day.imageSearchQuery)
+        }
+      }
+
+      return {
+        id: crypto.randomUUID(),
+        title: `Day ${day.day || ''}: ${day.title || ''}`,
+        content: `${day.description || ''}\n\nActivities:\n${(day.activities || []).map((a: string) => `- ${a}`).join('\n')}`,
+        images,
+      }
     }))
 
     setTripTitle(plan.title || 'My Trip Plan')
@@ -87,6 +106,7 @@ export default function PlanDetailPage() {
 
     // Use a small delay so store is populated before navigation
     setTimeout(() => {
+      setIsConverting(false)
       router.push('/memory?fromPlan=true')
     }, 100)
   }
@@ -179,10 +199,15 @@ export default function PlanDetailPage() {
         <div className="flex justify-center">
           <Button
             onClick={handleConvertToTrip}
-            className="bg-[#c96442] hover:bg-[#b05537] text-white rounded-full px-8 h-12 font-sans shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5"
+            disabled={isConverting}
+            className="bg-[#c96442] hover:bg-[#b05537] text-white rounded-full px-8 h-12 font-sans shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 disabled:opacity-70 disabled:hover:-translate-y-0"
           >
-            <PenLine className="w-5 h-5 mr-2" />
-            Convert to Trip Story
+            {isConverting ? (
+              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+            ) : (
+              <PenLine className="w-5 h-5 mr-2" />
+            )}
+            {isConverting ? 'Converting...' : 'Convert to Trip Story'}
           </Button>
         </div>
 

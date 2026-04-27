@@ -152,7 +152,7 @@ export default function NotificationsPage() {
       case 'trip_liked':
       case 'new_trip':
         if (notif.reference_id) {
-          router.push(`/my-memories/${notif.reference_id}`)
+          router.push(`/trip/${notif.reference_id}`)
         }
         break
     }

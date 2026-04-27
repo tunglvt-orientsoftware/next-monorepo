@@ -78,7 +78,7 @@ export function CinematicTheme({ trip, isOwner, hasLiked, likesCount, handleTogg
             {isOwner && (
               <>
                 <Link 
-                  href={`/my-memories/${trip.id}/edit`}
+                  href={`/trip/${trip.id}/edit`}
                   className="inline-flex items-center text-slate-400 hover:text-white font-medium uppercase tracking-[0.05em] sm:tracking-[0.1em] text-xs transition-colors px-3 py-1.5 sm:px-4 sm:py-2 border border-slate-800 hover:border-slate-600 rounded-sm whitespace-nowrap"
                 >
                   Edit <span className="hidden sm:inline sm:ml-1">Cut</span>

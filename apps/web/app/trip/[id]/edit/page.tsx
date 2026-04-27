@@ -36,7 +36,7 @@ export default function EditTripPage() {
 
       // Check ownership
       if (data.user_id !== user.id) {
-        router.push(`/my-memories/${params.id}`)
+        router.push(`/trip/${params.id}`)
         return
       }
 
@@ -73,7 +73,7 @@ export default function EditTripPage() {
     <div className="flex min-h-screen flex-col items-center py-6 md:py-16 bg-[#f5f4ed] px-4 font-serif relative">
       <div className="w-full max-w-6xl space-y-6 md:space-y-12">
         <div>
-          <Link href={`/my-memories/${params.id}`} className="inline-flex items-center text-[#c96442] hover:text-[#b05537] font-sans font-medium transition-colors bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border border-[#c96442]/20 mb-4">
+          <Link href={`/trip/${params.id}`} className="inline-flex items-center text-[#c96442] hover:text-[#b05537] font-sans font-medium transition-colors bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border border-[#c96442]/20 mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Cancel
           </Link>

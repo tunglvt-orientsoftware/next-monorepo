@@ -78,7 +78,7 @@ export function MagazineTheme({ trip, isOwner, hasLiked, likesCount, handleToggl
             {isOwner && (
               <>
                 <Link 
-                  href={`/my-memories/${trip.id}/edit`}
+                  href={`/trip/${trip.id}/edit`}
                   className="inline-flex items-center text-slate-900 hover:text-slate-500 font-sans uppercase tracking-widest text-xs font-semibold transition-colors sm:mr-4 whitespace-nowrap"
                 >
                   Edit
